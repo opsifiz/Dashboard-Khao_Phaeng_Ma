@@ -77,9 +77,10 @@
       </select>
     </div>
     <div id="map"></div>
-        <div id="floating-rect">
+    <div id="floating-rect">
         <span id="toggle-btn">–</span>
-        <b>ข้อมูลเพิ่มเติม</b><br>
+        <b>ข้อมูลเพิ่มเติม</b>
+        <br>
         <hr style="width: 90%;">
         <div id="moreInfo">
             <span style="color:#800000">■</span> มกราคม<br>
@@ -100,16 +101,16 @@
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
   <script>
-      const rect = document.getElementById("floating-rect");
-      const toggleBtn = document.getElementById("toggle-btn");
-      const info = document.getElementById('moreInfo');
+    const rect = document.getElementById("floating-rect");
+    const toggleBtn = document.getElementById("toggle-btn");
+    const info = document.getElementById('moreInfo');
 
-      toggleBtn.addEventListener("click", () => {
-          rect.classList.toggle("minimized");
-          toggleBtn.textContent = rect.classList.contains("minimized") ? "+" : "–";
-          info.style.display = (info.style.display === 'none') ? 'block' : 'none';
+    toggleBtn.addEventListener("click", () => {
+        rect.classList.toggle("minimized");
+        toggleBtn.textContent = rect.classList.contains("minimized") ? "+" : "–";
+        info.style.display = (info.style.display === 'none') ? 'block' : 'none';
 
-      });
+    });
 
     name2hex = {
       "ช้างป่า":  "#FF0000",
@@ -159,32 +160,40 @@
     fetch("data.json")
     .then(response => response.json())
     .then(res => {
-      const zoneNumber = 47;
-      const hemisphere = 'N';
-      const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
-      let ind = 0;
-      res.forEach(row => {
-          if(row.X == '-' || row.Y == '-' || row.Type == '-') return;
-          // if(row.Type != 'ช้างป่า' && row.Type != 'กระทิง' && row.Type != 'ลูกกระทิง') return;
-          if(row.Type == "ลูกกระทิง") row.Type = "กระทิง";
-          let year = parseInt(row["วัน/เดือน/ปี"].split('-')[0]);
-          if(year <= 2025) year += 543;
-          let month = parseInt(row["วัน/เดือน/ปี"].split('-')[1]);
-          // console.log(ind, row["วัน/เดือน/ปี"], month);
-          // ind += 1;
-          let x = parseInt(row.X);
-          let y = parseInt(row.Y);
-          const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
+        const zoneNumber = 47;
+        const hemisphere = 'N';
+        const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
+        let ind = 0;
+        res.forEach(row => {
+            if(row.X == '-' || row.Y == '-' || row.Type == '-') return;
+            if(row.Type == "ลูกกระทิง") row.Type = "กระทิง";
+            let year = parseInt(row["วัน/เดือน/ปี"].split('-')[0]);
+            if(year <= 2025) year += 543;
+            let month = parseInt(row["วัน/เดือน/ปี"].split('-')[1]);
+            // console.log(ind, row["วัน/เดือน/ปี"], month);
+            // ind += 1;
+            let x = parseInt(row.X);
+            let y = parseInt(row.Y);
+            const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
 
-          animals.add(row.Type);
+            animals.add(row.Type);
 
-          // console.log(name2hex[month]);
-          const shape = L.circleMarker([lat, lon], {
-              color: name2hex[month],
-              fillColor: name2hex[month],
-              fillOpacity: 0.3,
-              radius: 5
-          }).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
+            let shape = L.circleMarker([lat, lon], {
+                color: name2hex[month],
+                fillColor: name2hex[month],
+                fillOpacity: 0.3,
+                radius: 5
+            }).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
+
+            const curIcon = L.icon({
+                iconUrl: `assets/${row.Type}_${name2hex[month].slice(1)}.png`,
+                iconSize: [10, 10],
+                iconAnchor: [10, 10],
+                popupAnchor: [10, 10]
+            });
+
+            shape = L.marker([lat, lon], {icon: curIcon}
+            ).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
 
           animalLayers.push({type: row.Type, layer: shape, month: month, year: year });
           shape.addTo(map);
@@ -205,7 +214,6 @@
       let curAnimal = "all";
       let curMonth = "all";
       let curYear = "all";
-      let curColorMode = 1;
 
       selectAnimals.addEventListener("change", () => {
           curAnimal = selectAnimals.value;
@@ -244,25 +252,26 @@
       });
 
       colorSelect.addEventListener("change", () => {
-        const mode = colorSelect.value; // animal, month, year
+        const mode = colorSelect.value;
 
         animalLayers.forEach(obj => {
-          let color = "#000";
-          if (mode === "animal") {
-            color = name2hex[obj.type] || "#000";
-          } else if (mode === "month") {
-            // ใช้สีจากเดือน
-            color = name2hex[obj.month];
-          } else if (mode === "year") {
-            if (obj.year === 2566) color = "#FF0000";
-            else if (obj.year === 2567) color = "#0000FF";
-            else if (obj.year === 2568) color = "#00FF00";
-          }
-
-          obj.layer.setStyle({
-            color: color,
-            fillColor: color
-          });
+            if (mode === "animal") {
+                iconUrl = `assets/${obj.type}_${name2hex[obj.type].slice(1)}.png`;
+            } else if (mode === "month") {
+                iconUrl = `assets/${obj.type}_${name2hex[obj.month].slice(1)}.png`;
+            } else if (mode === "year") {
+                if (obj.year === 2566) iconUrl = `assets/${obj.type}_FF0000.png`;
+                else if (obj.year === 2567) iconUrl = `assets/${obj.type}_0000FF.png`;
+                else if (obj.year === 2568) iconUrl = `assets/${obj.type}_00FF00.png`;
+            }
+            if (obj.layer instanceof L.Marker) {
+                const newIcon = L.icon({
+                    iconUrl: iconUrl,
+                    iconSize: [10, 10]
+                });
+                obj.layer.setIcon(newIcon);
+            }
+            console.log(obj);
         });
         if(mode == "animal"){
             document.getElementById('moreInfo').innerHTML = `
