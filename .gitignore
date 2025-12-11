@@ -1,3 +1,4 @@
 *.py
-data.xlsx
+*.xlsx
 *.zip
+border-line_data/*

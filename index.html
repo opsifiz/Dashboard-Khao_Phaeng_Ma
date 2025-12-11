@@ -162,7 +162,8 @@
       "12": "#000000"
     }
 
-    const KHAO_PHAENG_MA = [14.3639, 101.8179];
+    const KHAO_PHAENG_MA = [14.375, 101.79];
+
     const map = L.map('map').setView(KHAO_PHAENG_MA, 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -186,7 +187,35 @@
     let animalLayers = [];
     let animals = new Set();
 
-    fetch("data.json")
+    fetch("./data/border_data.json")
+    .then(response => response.json())
+    .then(borderData => {
+
+      const zoneNumber = 47;
+      const hemisphere = 'N';
+      const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
+
+      const latlngs = borderData.map(pt => {
+        let x = parseFloat(pt.x);
+        let y = parseFloat(pt.y);
+        const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
+        return [lat, lon];
+      });
+
+      if (latlngs.length > 0) {
+        latlngs.push(latlngs[0]);
+      }
+
+      const borderPolygon = L.polygon(latlngs, {
+          color: "#FF0000",
+          weight: 2,
+          fillOpacity: 0.1
+      }).addTo(map);
+
+      map.fitBounds(borderPolygon.getBounds());
+    });
+
+    fetch("./data/animals_data.json")
     .then(response => response.json())
     .then(res => {
         const zoneNumber = 47;
@@ -244,12 +273,17 @@
       let curMonth = "all";
       let curYear = "all";
 
+      let xSum = 0;
+      let ySum = 0;
+
       selectAnimals.addEventListener("change", () => {
           curAnimal = selectAnimals.value;
           // console.log(value);
           animalLayers.forEach(obj => {
               if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
                   if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
+                  xSum += obj.X;
+                  ySum += obj.Y;
               } else {
                   if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
               }
