@@ -1,4 +1,5 @@
 *.py
 *.xlsx
 *.zip
+*.rar
 border-line_data/*
