@@ -68,8 +68,7 @@ function calculateInertia(points, labels, centroids) {
     return sum;
 }
 
-// ลอง k = 1..10 และเลือก k ที่ inertia ลดน้อยลง
-function findBestK(points, maxK=10) {
+function findBestK(points, maxK=100) {
     const inertias = [];
     for (let k=1; k<=maxK; k++) {
         const {centroids, labels} = kmeans(points, k, 10);

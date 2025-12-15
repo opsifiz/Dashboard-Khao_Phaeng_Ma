@@ -286,19 +286,12 @@
             let curAnimal = "all";
             let curSeason = "all";
 
-            let xSum = 0;
-            let ySum = 0;
-
             selectAnimals.addEventListener("change", () => {
                 curAnimal = selectAnimals.value;
-                xSum = 0;
-                ySum = 0;
                 // console.log(value);
                 animalLayers.forEach(obj => {
                     if((curAnimal === 'all' || obj.type == curAnimal) && (curSeason === 'all' || month2season[obj.month] == curSeason)){
                         if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-                        xSum += obj.X;
-                        ySum += obj.Y;
                     } else {
                         if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
                     }
@@ -307,8 +300,6 @@
             
             selectSeasons.addEventListener("change", () => {
                 curSeason = selectSeasons.value;
-                xSum = 0;
-                ySum = 0;
                 // console.log(value);
                 animalLayers.forEach(obj => {
                     if((curAnimal === 'all' || obj.type == curAnimal) && (curSeason === 'all' || month2season[obj.month] == curSeason)){
