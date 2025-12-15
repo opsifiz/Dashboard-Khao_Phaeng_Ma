@@ -58,6 +58,8 @@
             <option value="rainy">ฤดูฝน</option>
             <option value="winter">ฤดูหนาว</option>
         </select>
+        <label for="mapSelect">ประเภทแผนที่:</label>
+        <select id="mapSelect"></select>
         <label for="clustering">จัดกลุ่ม:</label>
         <button id="runBtn">ทำงาน</button>
     </div>
@@ -113,6 +115,7 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
+    <script src="scripts/mapSelector.js"></script>
     <script>
         const rect1 = document.getElementById("rect1");
         const toggleBtn1 = document.getElementById("toggle-btn1");

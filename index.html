@@ -1,85 +1,87 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <meta charset="utf-8" />
-  <title>Project #3</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-  <style>
-    html, body { height: 100%; margin: 0; }
-    #map { height: 90%; }
-    #controls { height: 10%; padding: 5px; background: #f7f7f7; display: flex; align-items: center; gap: 10px; }
-    .floating-rect {
-        position: fixed;
-        bottom: 20px;
-        width: 200px;
-        background-color: rgba(135, 135, 135, 0.8);
-        color: white;
-        padding: 10px;
-        border-radius: 10px;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        z-index: 1000;
-    }
+    <meta charset="utf-8" />
+    <title>Project #3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <style>
+        html, body { height: 100%; margin: 0; }
+        #map { height: 90%; }
+        #controls { height: 10%; padding: 5px; background: #f7f7f7; display: flex; align-items: center; gap: 10px; }
+        .floating-rect {
+            position: fixed;
+            bottom: 20px;
+            width: 200px;
+            background-color: rgba(135, 135, 135, 0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
 
-    .floating-rect.minimized {
-        height: 30px;
-        padding: 10px;
-    }
+        .floating-rect.minimized {
+            height: 30px;
+            padding: 10px;
+        }
 
-    .modal1{
-      height: 160px;
-    }
+        .modal1{
+            height: 160px;
+        }
 
-    .modal2{
-      height: 300px;
-    }
+        .modal2{
+            height: 300px;
+        }
 
-    .close-btn {
-        cursor: pointer;
-        font-size: 12px;
-        background-color: #f00;
-        border: 1px solid #888;
-        border-radius: 3px;
-        padding: 2px 5px;
-        float: right;
-    }
-  </style>
+        .close-btn {
+            cursor: pointer;
+            font-size: 12px;
+            background-color: #f00;
+            border: 1px solid #888;
+            border-radius: 3px;
+            padding: 2px 5px;
+            float: right;
+        }
+    </style>
 </head>
 <body>
     <div id="controls">
-      <label for="animalSelect">เลือกสัตว์:</label>
-      <select id="animalSelect">
-        <option value="all">ทั้งหมด</option>
-      </select>
-      <label for="monthSelect">เลือกเดือน:</label>
-      <select id="monthSelect">
-        <option value="all">ทั้งหมด</option>
-        <option value="1">ม.ค.</option>
-        <option value="2">ก.พ.</option>
-        <option value="3">มี.ค.</option>
-        <option value="4">เม.ษ.</option>
-        <option value="5">พ.ค.</option>
-        <option value="6">มิ.ย.</option>
-        <option value="7">ก.ค.</option>
-        <option value="8">ส.ค.</option>
-        <option value="9">ก.ย.</option>
-        <option value="10">ต.ค.</option>
-        <option value="11">พ.ย.</option>
-        <option value="12">ธ.ค.</option>
-      </select>
-      <label for="yearSelect">เลือกปี:</label>
-      <select id="yearSelect">
-        <option value="all">ทั้งหมด</option>
-        <option value="2566">2566</option>
-        <option value="2567">2567</option>
-        <option value="2568">2568</option>
-      </select>
-      <label for="colorSelect">แยกสีตาม:</label>
-      <select id="colorSelect">
-        <option value="animal">สัตว์</option>
-        <option value="month" selected>เดือน</option>
-        <option value="year">ปี</option>
-      </select>
+        <label for="animalSelect">เลือกสัตว์:</label>
+        <select id="animalSelect">
+            <option value="all">ทั้งหมด</option>
+        </select>
+        <label for="monthSelect">เลือกเดือน:</label>
+        <select id="monthSelect">
+            <option value="all">ทั้งหมด</option>
+            <option value="1">ม.ค.</option>
+            <option value="2">ก.พ.</option>
+            <option value="3">มี.ค.</option>
+            <option value="4">เม.ษ.</option>
+            <option value="5">พ.ค.</option>
+            <option value="6">มิ.ย.</option>
+            <option value="7">ก.ค.</option>
+            <option value="8">ส.ค.</option>
+            <option value="9">ก.ย.</option>
+            <option value="10">ต.ค.</option>
+            <option value="11">พ.ย.</option>
+            <option value="12">ธ.ค.</option>
+        </select>
+        <label for="yearSelect">เลือกปี:</label>
+        <select id="yearSelect">
+            <option value="all">ทั้งหมด</option>
+            <option value="2566">2566</option>
+            <option value="2567">2567</option>
+            <option value="2568">2568</option>
+        </select>
+        <label for="colorSelect">แยกสีตาม:</label>
+        <select id="colorSelect">
+            <option value="animal">สัตว์</option>
+            <option value="month" selected>เดือน</option>
+            <option value="year">ปี</option>
+        </select>
+        <label for="mapSelect">ประเภทแผนที่:</label>
+        <select id="mapSelect"></select>
     </div>
     <div id="map"></div>
     <div class="floating-rect modal1" id="rect1" style="top: 20px; right: 20px;">
@@ -118,257 +120,261 @@
         </div>
     </div>
 
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
-  <script>
-    const rect1 = document.getElementById("rect1");
-    const toggleBtn1 = document.getElementById("toggle-btn1");
-    const dataInfo = document.getElementById('data');
-    
-    toggleBtn1.addEventListener("click", () => {
-      rect1.classList.toggle("minimized");
-      toggleBtn1.textContent = rect1.classList.contains("minimized") ? "+" : "–";
-      dataInfo.style.display = (dataInfo.style.display === 'none') ? 'block' : 'none';
-    });
-      
-    const rect2 = document.getElementById("rect2");
-    const toggleBtn2 = document.getElementById("toggle-btn2");
-    const info = document.getElementById('moreInfo');
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
+    <script src="scripts/mapSelector.js"></script>
+    <script>
+          const rect1 = document.getElementById("rect1");
+          const toggleBtn1 = document.getElementById("toggle-btn1");
+          const dataInfo = document.getElementById('data');
+        
+          toggleBtn1.addEventListener("click", () => {
+              rect1.classList.toggle("minimized");
+              toggleBtn1.textContent = rect1.classList.contains("minimized") ? "+" : "–";
+              dataInfo.style.display = (dataInfo.style.display === 'none') ? 'block' : 'none';
+          });
+          
+          const rect2 = document.getElementById("rect2");
+          const toggleBtn2 = document.getElementById("toggle-btn2");
+          const info = document.getElementById('moreInfo');
 
-    toggleBtn2.addEventListener("click", () => {
-      rect2.classList.toggle("minimized");
-      toggleBtn2.textContent = rect2.classList.contains("minimized") ? "+" : "–";
-      info.style.display = (info.style.display === 'none') ? 'block' : 'none';
-    });
+          toggleBtn2.addEventListener("click", () => {
+              rect2.classList.toggle("minimized");
+              toggleBtn2.textContent = rect2.classList.contains("minimized") ? "+" : "–";
+              info.style.display = (info.style.display === 'none') ? 'block' : 'none';
+          });
 
-    name2hex = {
-      "ช้างป่า":  "#FF0000",
-      "กระทิง":  "#0000FF",
-      "ลิงกัง":   "#00FF00",
-      "เลียงผา": "#FF7F00",
-      "กวาง":   "#4B0082",
-      "หมีควาย": "#8B00FF",
-      "1":  "#800000",
-      "2":  "#FF0000",
-      "3":  "#FF7F00",
-      "4":  "#FFC0CB",
-      "5":  "#FFFF00",
-      "6":  "#00FF00",
-      "7":  "#0000FF",
-      "8":  "#8B00FF",
-      "9":  "#4B0082",
-      "10": "#A9A9A9",
-      "11": "#4c4c4c",
-      "12": "#000000"
-    }
+          const name2hex = {
+              "ช้างป่า":  "#FF0000",
+              "กระทิง":  "#0000FF",
+              "ลิงกัง":   "#00FF00",
+              "เลียงผา": "#FF7F00",
+              "กวาง":   "#4B0082",
+              "หมีควาย": "#8B00FF",
+              "1":  "#800000",
+              "2":  "#FF0000",
+              "3":  "#FF7F00",
+              "4":  "#FFC0CB",
+              "5":  "#FFFF00",
+              "6":  "#00FF00",
+              "7":  "#0000FF",
+              "8":  "#8B00FF",
+              "9":  "#4B0082",
+              "10": "#A9A9A9",
+              "11": "#4c4c4c",
+              "12": "#000000"
+          };
 
-    const KHAO_PHAENG_MA = [14.375, 101.79];
+          const KHAO_PHAENG_MA = [14.375, 101.79];
 
-    const map = L.map('map').setView(KHAO_PHAENG_MA, 12);
+          const map = L.map('map').setView(KHAO_PHAENG_MA, 12);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
 
-    const redIcon = L.icon({
-      iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-      shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41]
-    });
 
-    L.marker(KHAO_PHAENG_MA, { icon: redIcon })
-      .addTo(map)
-      .bindPopup("<b>เขาแผงม้า</b>")
-      .openPopup();
 
-    let animalLayers = [];
-    let animals = new Set();
+          maps.osm.addTo(map);
 
-    fetch("./data/border_data.json")
-    .then(response => response.json())
-    .then(borderData => {
+          const redIcon = L.icon({
+              iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+              shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              shadowSize: [41, 41]
+          });
 
-      const zoneNumber = 47;
-      const hemisphere = 'N';
-      const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
+          L.marker(KHAO_PHAENG_MA, { icon: redIcon })
+          .addTo(map)
+          .bindPopup("<b>เขาแผงม้า</b>")
+          .openPopup();
 
-      const latlngs = borderData.map(pt => {
-        let x = parseFloat(pt.x);
-        let y = parseFloat(pt.y);
-        const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
-        return [lat, lon];
-      });
+          let animalLayers = [];
+          let animals = new Set();
 
-      if (latlngs.length > 0) {
-        latlngs.push(latlngs[0]);
-      }
+          fetch("./data/border_data.json")
+          .then(response => response.json())
+          .then(borderData => {
 
-      const borderPolygon = L.polygon(latlngs, {
-          color: "#FF0000",
-          weight: 2,
-          fillOpacity: 0.1
-      }).addTo(map);
+              const zoneNumber = 47;
+              const hemisphere = 'N';
+              const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
 
-      map.fitBounds(borderPolygon.getBounds());
-    });
+              const latlngs = borderData.map(pt => {
+                  let x = parseFloat(pt.x);
+                  let y = parseFloat(pt.y);
+                  const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
+                  return [lat, lon];
+              });
 
-    fetch("./data/animals_data.json")
-    .then(response => response.json())
-    .then(res => {
-        const zoneNumber = 47;
-        const hemisphere = 'N';
-        const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
-        let ind = 0;
-        res.forEach(row => {
-            if(row.X == '-' || row.Y == '-' || row.Type == '-') return;
-            if(row.Type == "ลูกกระทิง") row.Type = "กระทิง";
-            let year = parseInt(row["วัน/เดือน/ปี"].split('-')[0]);
-            if(year <= 2025) year += 543;
-            let month = parseInt(row["วัน/เดือน/ปี"].split('-')[1]);
-            // console.log(ind, row["วัน/เดือน/ปี"], month);
-            // ind += 1;
-            let x = parseInt(row.X);
-            let y = parseInt(row.Y);
-            const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
+              if (latlngs.length > 0) {
+                  latlngs.push(latlngs[0]);
+              }
 
-            animals.add(row.Type);
+              const borderPolygon = L.polygon(latlngs, {
+                  color: "#FF0000",
+                  weight: 2,
+                  fillOpacity: 0.1
+              }).addTo(map);
 
-            let shape = L.circleMarker([lat, lon], {
-                color: name2hex[month],
-                fillColor: name2hex[month],
-                fillOpacity: 0.3,
-                radius: 5
-            }).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
+              map.fitBounds(borderPolygon.getBounds());
+          });
 
-            const curIcon = L.icon({
-                iconUrl: `assets/${row.Type}_${name2hex[month].slice(1)}.png`,
-                iconSize: [10, 10],
-                iconAnchor: [10, 10],
-                popupAnchor: [10, 10]
+          fetch("./data/animals_data.json")
+          .then(response => response.json())
+          .then(res => {
+              const zoneNumber = 47;
+              const hemisphere = 'N';
+              const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
+              let ind = 0;
+              res.forEach(row => {
+                  if(row.X == '-' || row.Y == '-' || row.Type == '-') return;
+                  if(row.Type == "ลูกกระทิง") row.Type = "กระทิง";
+                  let year = parseInt(row["วัน/เดือน/ปี"].split('-')[0]);
+                  if(year <= 2025) year += 543;
+                  let month = parseInt(row["วัน/เดือน/ปี"].split('-')[1]);
+                  // console.log(ind, row["วัน/เดือน/ปี"], month);
+                  // ind += 1;
+                  let x = parseInt(row.X);
+                  let y = parseInt(row.Y);
+                  const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
+
+                  animals.add(row.Type);
+
+                  let shape = L.circleMarker([lat, lon], {
+                      color: name2hex[month],
+                      fillColor: name2hex[month],
+                      fillOpacity: 0.3,
+                      radius: 5
+                  }).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
+
+                  const curIcon = L.icon({
+                      iconUrl: `assets/${row.Type}_${name2hex[month].slice(1)}.png`,
+                      iconSize: [10, 10],
+                      iconAnchor: [10, 10],
+                      popupAnchor: [10, 10]
+                  });
+
+                  shape = L.marker([lat, lon], {icon: curIcon}
+                  ).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
+
+                animalLayers.push({type: row.Type, layer: shape, month: month, year: year });
+                shape.addTo(map);
             });
 
-            shape = L.marker([lat, lon], {icon: curIcon}
-            ).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
+          const selectAnimals = document.getElementById("animalSelect");
+          const selectMonths = document.getElementById("monthSelect");
+          const selectYears = document.getElementById("yearSelect");
+          const selectColor = document.getElementById("colorSelect");
 
-          animalLayers.push({type: row.Type, layer: shape, month: month, year: year });
-          shape.addTo(map);
-      });
-
-      const selectAnimals = document.getElementById("animalSelect");
-      const selectMonths = document.getElementById("monthSelect");
-      const selectYears = document.getElementById("yearSelect");
-      const selectColor = document.getElementById("colorSelect");
-
-      Array.from(animals).forEach(a => {
-          const opt = document.createElement("option");
-          opt.value = a;
-          opt.textContent = a;
-          selectAnimals.appendChild(opt);
-      });
-
-      let curAnimal = "all";
-      let curMonth = "all";
-      let curYear = "all";
-
-      let xSum = 0;
-      let ySum = 0;
-
-      selectAnimals.addEventListener("change", () => {
-          curAnimal = selectAnimals.value;
-          // console.log(value);
-          animalLayers.forEach(obj => {
-              if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
-                  if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-                  xSum += obj.X;
-                  ySum += obj.Y;
-              } else {
-                  if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
-              }
+          Array.from(animals).forEach(a => {
+              const opt = document.createElement("option");
+              opt.value = a;
+              opt.textContent = a;
+              selectAnimals.appendChild(opt);
           });
-      });
 
-      selectMonths.addEventListener("change", () => {
-          curMonth = selectMonths.value;
-          // console.log(curMonth);
-          animalLayers.forEach(obj => {
-              if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
-                  if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-              } else {
-                  if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
-              }
+          let curAnimal = "all";
+          let curMonth = "all";
+          let curYear = "all";
+
+          let xSum = 0;
+          let ySum = 0;
+
+          selectAnimals.addEventListener("change", () => {
+              curAnimal = selectAnimals.value;
+              // console.log(value);
+              animalLayers.forEach(obj => {
+                  if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
+                      if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
+                      xSum += obj.X;
+                      ySum += obj.Y;
+                  } else {
+                      if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
+                  }
+              });
           });
-      });
 
-      selectYears.addEventListener("change", () => {
-          curYear = selectYears.value;
-          // console.log(value);
-          animalLayers.forEach(obj => {
-              if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
-                  if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-              } else {
-                  if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
-              }
+          selectMonths.addEventListener("change", () => {
+              curMonth = selectMonths.value;
+              // console.log(curMonth);
+              animalLayers.forEach(obj => {
+                  if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
+                      if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
+                  } else {
+                      if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
+                  }
+              });
           });
-      });
 
-      colorSelect.addEventListener("change", () => {
-        const mode = colorSelect.value;
+          selectYears.addEventListener("change", () => {
+              curYear = selectYears.value;
+              // console.log(value);
+              animalLayers.forEach(obj => {
+                  if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
+                      if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
+                  } else {
+                      if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
+                  }
+              });
+          });
 
-        animalLayers.forEach(obj => {
-            if (mode === "animal") {
-                iconUrl = `assets/${obj.type}_${name2hex[obj.type].slice(1)}.png`;
-            } else if (mode === "month") {
-                iconUrl = `assets/${obj.type}_${name2hex[obj.month].slice(1)}.png`;
-            } else if (mode === "year") {
-                if (obj.year === 2566) iconUrl = `assets/${obj.type}_FF0000.png`;
-                else if (obj.year === 2567) iconUrl = `assets/${obj.type}_0000FF.png`;
-                else if (obj.year === 2568) iconUrl = `assets/${obj.type}_00FF00.png`;
-            }
-            if (obj.layer instanceof L.Marker) {
-                const newIcon = L.icon({
-                    iconUrl: iconUrl,
-                    iconSize: [10, 10]
+            colorSelect.addEventListener("change", () => {
+                const mode = colorSelect.value;
+
+                animalLayers.forEach(obj => {
+                    if (mode === "animal") {
+                        iconUrl = `assets/${obj.type}_${name2hex[obj.type].slice(1)}.png`;
+                    } else if (mode === "month") {
+                        iconUrl = `assets/${obj.type}_${name2hex[obj.month].slice(1)}.png`;
+                    } else if (mode === "year") {
+                        if (obj.year === 2566) iconUrl = `assets/${obj.type}_FF0000.png`;
+                        else if (obj.year === 2567) iconUrl = `assets/${obj.type}_0000FF.png`;
+                        else if (obj.year === 2568) iconUrl = `assets/${obj.type}_00FF00.png`;
+                    }
+                    if (obj.layer instanceof L.Marker) {
+                        const newIcon = L.icon({
+                            iconUrl: iconUrl,
+                            iconSize: [10, 10]
+                        });
+                        obj.layer.setIcon(newIcon);
+                    }
+                    console.log(obj);
                 });
-                obj.layer.setIcon(newIcon);
-            }
-            console.log(obj);
+              if(mode == "animal"){
+                  document.getElementById('moreInfo').innerHTML = `
+                  <span style="color:${name2hex["ช้างป่า"]}">■</span> ช้างป่า<br>
+                  <span style="color:${name2hex["ลิงกัง"]}">■</span> ลิงกัง<br>
+                  <span style="color:${name2hex["กระทิง"]}">■</span> กระทิง<br>
+                  <span style="color:${name2hex["เลียงผา"]}">■</span> เลียงผา<br>
+                  <span style="color:${name2hex["กวาง"]}">■</span> กวาง<br>
+                  <span style="color:${name2hex["หมีควาย"]}">■</span> หมีควาย<br>
+                  `;
+              }else if(mode == "month"){
+                  document.getElementById('moreInfo').innerHTML = `
+                  <span style="color:#800000">■</span> มกราคม<br>
+                  <span style="color:#FF0000">■</span> กุมภาพันธ์<br>
+                  <span style="color:#FF7F00">■</span> มีนาคม<br>
+                  <span style="color:#FFC0CB">■</span> เมษายน<br>
+                  <span style="color:#FFFF00">■</span> พฤษภาคม<br>
+                  <span style="color:#00FF00">■</span> มิถุนายน<br>
+                  <span style="color:#0000FF">■</span> กรกฎาคม<br>
+                  <span style="color:#8B00FF">■</span> สิงหาคม<br>
+                  <span style="color:#4B0082">■</span> กันยายน<br>
+                  <span style="color:#A9A9A9">■</span> ตุลาคม<br>
+                  <span style="color:#4c4c4c">■</span> พฤศจิกายน<br>
+                  <span style="color:#000000">■</span> ธันวาคม<br>
+                  `;
+              }else if(mode == "year"){
+                  document.getElementById('moreInfo').innerHTML = `
+                  <span style="color:#FF0000">■</span> 2566<br>
+                  <span style="color:#0000FF">■</span> 2567<br>
+                  <span style="color:#00FF00">■</span> 2568<br>
+                  `;
+              }
+            });
+
+
         });
-        if(mode == "animal"){
-            document.getElementById('moreInfo').innerHTML = `
-            <span style="color:${name2hex["ช้างป่า"]}">■</span> ช้างป่า<br>
-            <span style="color:${name2hex["ลิงกัง"]}">■</span> ลิงกัง<br>
-            <span style="color:${name2hex["กระทิง"]}">■</span> กระทิง<br>
-            <span style="color:${name2hex["เลียงผา"]}">■</span> เลียงผา<br>
-            <span style="color:${name2hex["กวาง"]}">■</span> กวาง<br>
-            <span style="color:${name2hex["หมีควาย"]}">■</span> หมีควาย<br>
-            `;
-        }else if(mode == "month"){
-            document.getElementById('moreInfo').innerHTML = `
-            <span style="color:#800000">■</span> มกราคม<br>
-            <span style="color:#FF0000">■</span> กุมภาพันธ์<br>
-            <span style="color:#FF7F00">■</span> มีนาคม<br>
-            <span style="color:#FFC0CB">■</span> เมษายน<br>
-            <span style="color:#FFFF00">■</span> พฤษภาคม<br>
-            <span style="color:#00FF00">■</span> มิถุนายน<br>
-            <span style="color:#0000FF">■</span> กรกฎาคม<br>
-            <span style="color:#8B00FF">■</span> สิงหาคม<br>
-            <span style="color:#4B0082">■</span> กันยายน<br>
-            <span style="color:#A9A9A9">■</span> ตุลาคม<br>
-            <span style="color:#4c4c4c">■</span> พฤศจิกายน<br>
-            <span style="color:#000000">■</span> ธันวาคม<br>
-            `;
-        }else if(mode == "year"){
-            document.getElementById('moreInfo').innerHTML = `
-            <span style="color:#FF0000">■</span> 2566<br>
-            <span style="color:#0000FF">■</span> 2567<br>
-            <span style="color:#00FF00">■</span> 2568<br>
-            `;
-        }
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>
