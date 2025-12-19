@@ -143,6 +143,23 @@
         const showBorderBtn = document.getElementById("showBorder");
         const borderColorValue = document.getElementById("borderColor");
 
+        const selectAllBtn = document.querySelector(".btn-select-all");
+        const clearAllBtn = document.querySelector(".btn-clear-all");
+
+        selectAllBtn.onclick = () => {
+            data.forEach(item => selected.add(item.value));
+            renderSelected();
+            renderOptions(searchInput.valuel);
+            renderProvinceBorders();
+        };
+        
+        clearAllBtn.onclick = () => {
+            selected.clear();
+            renderSelected();
+            renderOptions(searchInput.valuel);
+            renderProvinceBorders();
+        };
+
         showBorderBtn.addEventListener("change", renderProvinceBorders);
         borderColorValue.addEventListener("input", renderProvinceBorders);
 
