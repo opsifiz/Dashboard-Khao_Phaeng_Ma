@@ -149,14 +149,14 @@
         selectAllBtn.onclick = () => {
             data.forEach(item => selected.add(item.value));
             renderSelected();
-            renderOptions(searchInput.valuel);
+            renderOptions(searchInput.value);
             renderProvinceBorders();
         };
         
         clearAllBtn.onclick = () => {
             selected.clear();
             renderSelected();
-            renderOptions(searchInput.valuel);
+            renderOptions(searchInput.value);
             renderProvinceBorders();
         };
 
@@ -337,6 +337,7 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
     <script src="scripts/selector/animalSelector.js"></script>
+    <script src="scripts/selector/seasonSelector.js"></script>
     <script src="scripts/selector/mapSelector.js"></script>
 
     <script>
@@ -381,21 +382,7 @@
             "12": "#000000"
         }
 
-        const month2season = [
-            "-",
-            "winter",
-            "winter",
-            "summer",
-            "summer",
-            "summer",
-            "summer",
-            "rainy",
-            "rainy",
-            "rainy",
-            "rainy",
-            "winter",
-            "winter",
-        ];
+        
 
         const color2hex = {
             "red" : "#FF0000",
@@ -487,7 +474,6 @@
             });
 
             const selectAnimals = document.getElementById("animalSelect");
-            const selectSeasons = document.getElementById("seasonSelect");
 
             Array.from(animals).forEach(a => {
                 const opt = document.createElement("option");
@@ -495,9 +481,6 @@
                 opt.textContent = a;
                 selectAnimals.appendChild(opt);
             });
-
-            let curAnimal = "all";
-            let curSeason = "all";
 
             selectAnimals.addEventListener("change", () => {
                 curAnimal = selectAnimals.value;
@@ -511,18 +494,6 @@
                 });
             });
             
-            selectSeasons.addEventListener("change", () => {
-                curSeason = selectSeasons.value;
-                // console.log(value);
-                animalLayers.forEach(obj => {
-                    if((curAnimal === 'all' || obj.type == curAnimal) && (curSeason === 'all' || month2season[obj.month] == curSeason)){
-                        if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-                    } else {
-                        if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
-                    }
-                });
-            });
-
             function filtering(res, curAnimal, curSeason){
                 res = res.filter(row => row.Type === curAnimal && month2season[row.month] === curSeason);
                 return res;
