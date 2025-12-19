@@ -117,6 +117,10 @@
                 </div>
                 <div class="dropdown hidden">
                     <input type="text" class="search" placeholder="Search...">
+                    <div class="action-bar">
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
+                    </div>
                     <ul class="options"></ul>
                 </div>
             </div>
@@ -182,8 +186,6 @@
                     }
 
                     const geojson = await res.json();
-
-                    console.log(geojson);
 
                     const layer = L.geoJSON(geojson, {
                         style: {
@@ -317,6 +319,7 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
+    <script src="scripts/selector/animalSelector.js"></script>
     <script src="scripts/selector/mapSelector.js"></script>
 
     <script>
@@ -408,33 +411,23 @@
         let animalLayers = [];
         let animals = new Set();
 
-        fetch("./data/border_data.json")
-        .then(response => response.json())
-        .then(borderData => {
-
-            const zoneNumber = 47;
-            const hemisphere = 'N';
-            const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
-
-            const latlngs = borderData.map(pt => {
-                let x = parseFloat(pt.x);
-                let y = parseFloat(pt.y);
-                const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
-                return [lat, lon];
-            });
-
-            if (latlngs.length > 0) {
-                latlngs.push(latlngs[0]);
-            }
-
-            const borderPolygon = L.polygon(latlngs, {
-                color: "#FF0000",
-                weight: 2,
-                fillOpacity: 0
+        fetch("./border/khao_phaeng_ma.geojson")
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to load GeoJSON");
+            return res.json();
+        })
+        .then(geojsonData => {
+            const borderPolygon = L.geoJSON(geojsonData, {
+                style: {
+                    color: "#FF0000",
+                    weight: 2,
+                    fillOpacity: 0
+                }
             }).addTo(map);
 
             map.fitBounds(borderPolygon.getBounds());
-        });
+        })
+        .catch(err => console.error(err));
 
         fetch("./data/animals_data.json")
         .then(response => response.json())

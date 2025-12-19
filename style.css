@@ -119,3 +119,23 @@
     border-radius: 4px;
     font-size: 12px;
 }
+
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px;
+    border-bottom: 1px solid #eee;
+}
+
+.action-bar button {
+    font-size: 12px;
+    padding: 4px 8px;
+    border: 1px solid #ccc;
+    background: #f9f9f9;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.action-bar button:hover {
+    background: #eaeaea;
+}
