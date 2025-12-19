@@ -44,6 +44,7 @@
             float: right;
         }
     </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="controls">
@@ -62,6 +63,9 @@
         <select id="mapSelect"></select>
         <label for="clustering">จัดกลุ่ม:</label>
         <button id="runBtn">ทำงาน</button>
+        <button id="borderLineModalBtn">
+            <label for="borderLineModal">ตั้งค่าเส้นเขตแดน</label>
+        </button>
     </div>
     <div id="map"></div>
     <div class="floating-rect modal1" id="rect1" style="top: 20px; right: 20px;">
@@ -99,6 +103,203 @@
             <span style="color:#000000">■</span> ธันวาคม<br>
         </div>
     </div>
+    <div id="borderLineModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close" id="close-tutorial">&times;</span>
+            <p class="modal-title">ตั้งค่าเส้นเขตแดน</p>
+            <hr>
+            <p class="modal-sub-title">จังหวัด</p>
+            <!-- <hr style="width: 80%;"> -->
+            <div class="multi-select center" id="multiSelect">
+                <div class="selected" id="selectedItems">
+                    <span class="placeholder">Select Provinces</span>
+                </div>
+                <div class="dropdown hidden">
+                    <input type="text" class="search" placeholder="Search...">
+                    <ul class="options"></ul>
+                </div>
+            </div>
+            <p class="modal-sub-title">อำเภอ</p>
+            <hr style="width: 80%;">
+            <p class="modal-sub-title">ตำบล</p>
+            <hr style="width: 80%;">
+            <p class="modal-sub-title">เขตเขาแผงม้า</p>
+            <hr style="width: 80%;">
+            <p>Show Border</p>
+            <input type="checkbox" name="" id="showBorder">
+            <span>show</span>
+            <br>
+            <p>Border Color</p>
+            <input disabled type="color" name="" value="#ff0000" id="borderColor">
+            <br>
+        </div>
+    </div>
+    <script type="module">
+        const showBorderBtn = document.getElementById("showBorder");
+        const borderColorValue = document.getElementById("borderColor");
+
+        showBorderBtn.addEventListener("change", renderProvinceBorders);
+        borderColorValue.addEventListener("input", renderProvinceBorders);
+
+
+        showBorderBtn.addEventListener("change", ()=>{
+            const value = showBorderBtn.checked;
+            borderColorValue.disabled = !value;
+        });
+
+        async function loadData(){
+            const data = await fetch("./data/provinces.json").then(response => response.json());
+            return data.map(p => ({label: p.name_en, value: p.name_en.toLowerCase().replace(/\s+/g, '_')}));
+        }
+
+        const data = await loadData();
+
+        const multiSelect = document.getElementById("multiSelect");
+        const selectedBox = document.getElementById("selectedItems");
+        const dropdown = multiSelect.querySelector(".dropdown");
+        const searchInput = multiSelect.querySelector(".search");
+        const optionsList = multiSelect.querySelector(".options");
+
+        let selected = new Set();
+        let provinceBorderLayers = {};
+
+        async function renderProvinceBorders(){
+            Object.values(provinceBorderLayers).forEach(layer => {
+                if(map.hasLayer(layer)) map.removeLayer(layer);
+            });
+
+            provinceBorderLayers = {};
+
+            if(!showBorderBtn.checked) return;
+
+            for(const value of selected){
+                try{
+                    const res = await fetch(`./border/province/${value}.geojson`);
+                    if(!res.ok){
+                        console.error(`Failed to fetch ./border/province/${value}.geojson`);
+                        continue;
+                    }
+
+                    const geojson = await res.json();
+
+                    console.log(geojson);
+
+                    const layer = L.geoJSON(geojson, {
+                        style: {
+                            color: borderColorValue.value,
+                            weight: 2,
+                            fillOpacity: 0
+                        }
+                    }).addTo(map);
+
+                    provinceBorderLayers[value] = layer;
+                }catch(err){
+                    console.error(err);
+                }
+            }
+        }
+
+        function renderOptions(filter = "") {
+            optionsList.innerHTML = "";
+            data
+            .filter(item => item.label.toLowerCase().includes(filter.toLowerCase()))
+            .forEach(item => {
+                const label = item.label;
+                const value = item.value;
+
+                const li = document.createElement("li");
+                li.textContent = label;
+                li.dataset.value = value;
+
+                if (selected.has(value)) {
+                    li.style.fontWeight = "bold";
+                }
+
+                li.onclick = () => {
+                    selected.has(value) ? selected.delete(value) : selected.add(value);
+                    renderSelected();
+                    renderOptions(searchInput.value);
+                    renderProvinceBorders();
+                };
+
+                optionsList.appendChild(li);
+            });
+        }
+
+        function renderSelected() {
+            selectedBox.innerHTML = "";
+            if (selected.size === 0) {
+                selectedBox.innerHTML = `<span class="placeholder">Select Provinces</span>`;
+                return;
+            }
+            selected.forEach(value => {
+                const label = data.find(d => d.value === value).label;
+
+                const tag = document.createElement("span");
+                tag.className = "tag";
+                tag.dataset.value = value;
+
+                const text = document.createElement("span");
+                text.innerText = label;
+
+                const removeBtn = document.createElement("span");
+                removeBtn.innerText = "X";
+                removeBtn.style.cursor = "pointer";
+                removeBtn.style.marginLeft = "4px";
+                removeBtn.style.color = "red";
+
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const v = tag.dataset.value;
+                    selected.delete(v);
+                    renderSelected();
+                    renderOptions(searchInput.value);
+                    renderProvinceBorders();
+                };
+
+                tag.appendChild(text);
+                tag.appendChild(removeBtn);
+                selectedBox.appendChild(tag);
+            });
+            console.log(selected);
+        }
+
+        selectedBox.onclick = () => {
+            dropdown.classList.toggle("hidden");
+            searchInput.focus();
+        };
+
+        searchInput.oninput = (e) => {
+            renderOptions(e.target.value);
+        };
+
+        document.addEventListener("click", (e) => {
+            if (!multiSelect.contains(e.target)) {
+                dropdown.classList.add("hidden");
+            }
+        });
+
+        renderOptions();
+    </script>
+
+    <script>
+        var modal1 = document.getElementById("borderLineModal");
+        var btn1 = document.getElementById("borderLineModalBtn");
+        var span1 = document.getElementsByClassName("close")[0];
+        btn1.onclick = function() {
+            modal1.style.display = "block";
+        }
+        span1.onclick = function() {
+            modal1.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal1) {
+                modal1.style.display = "none";
+            }
+        }
+    </script>
 
     <script src="clustering.js"></script>
     <script src="scripts/clustering/dbscan.js"></script>
@@ -116,7 +317,8 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
-    <script src="scripts/mapSelector.js"></script>
+    <script src="scripts/selector/mapSelector.js"></script>
+
     <script>
         const rect1 = document.getElementById("rect1");
         const toggleBtn1 = document.getElementById("toggle-btn1");
@@ -228,7 +430,7 @@
             const borderPolygon = L.polygon(latlngs, {
                 color: "#FF0000",
                 weight: 2,
-                fillOpacity: 0.1
+                fillOpacity: 0
             }).addTo(map);
 
             map.fitBounds(borderPolygon.getBounds());
