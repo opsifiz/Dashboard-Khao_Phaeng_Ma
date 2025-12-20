@@ -52,12 +52,7 @@
             <option value="all">ทั้งหมด</option>
         </select>
         <label for="yearSelect">เลือกฤดู:</label>
-        <select id="seasonSelect">
-            <option value="all">ทั้งหมด</option>
-            <option value="summer">ฤดูร้อน</option>
-            <option value="rainy">ฤดูฝน</option>
-            <option value="winter">ฤดูหนาว</option>
-        </select>
+        <select id="seasonSelect"></select>
         <label for="mapSelect">ประเภทแผนที่:</label>
         <select id="mapSelect"></select>
         <label for="clustering">จัดกลุ่ม:</label>
@@ -115,9 +110,7 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
-    <script src="scripts/selector/animalSelector.js"></script>
-    <script src="scripts/selector/seasonSelector.js"></script>
-    <script src="scripts/selector/mapSelector.js"></script>
+    <script src="scripts/selectors.js"></script>
     <script>
         const rect1 = document.getElementById("rect1");
         const toggleBtn1 = document.getElementById("toggle-btn1");
@@ -138,27 +131,6 @@
             toggleBtn2.textContent = rect2.classList.contains("minimized") ? "+" : "–";
             info.style.display = (info.style.display === 'none') ? 'block' : 'none';
         });
-
-        const name2hex = {
-            "ช้างป่า":  "#FF0000",
-            "กระทิง":  "#0000FF",
-            "ลิงกัง":   "#00FF00",
-            "เลียงผา": "#FF7F00",
-            "กวาง":   "#4B0082",
-            "หมีควาย": "#8B00FF",
-            "1":  "#800000",
-            "2":  "#FF0000",
-            "3":  "#FF7F00",
-            "4":  "#FFC0CB",
-            "5":  "#FFFF00",
-            "6":  "#00FF00",
-            "7":  "#0000FF",
-            "8":  "#8B00FF",
-            "9":  "#4B0082",
-            "10": "#A9A9A9",
-            "11": "#4c4c4c",
-            "12": "#000000"
-        }
 
         const color2hex = {
             "red" : "#FF0000",
@@ -249,18 +221,18 @@
                 shape.addTo(map);
             });
 
-            const selectAnimals = document.getElementById("animalSelect");
+            const selectAnimal = document.getElementById("animalSelect");
             const selectSeasons = document.getElementById("seasonSelect");
 
             Array.from(animals).forEach(a => {
                 const opt = document.createElement("option");
                 opt.value = a;
                 opt.textContent = a;
-                selectAnimals.appendChild(opt);
+                selectAnimal.appendChild(opt);
             });
 
-            selectAnimals.addEventListener("change", () => {
-                curAnimal = selectAnimals.value;
+            selectAnimal.addEventListener("change", () => {
+                curAnimal = selectAnimal.value;
                 // console.log(value);
                 animalLayers.forEach(obj => {
                     if((curAnimal === 'all' || obj.type == curAnimal) && (curSeason === 'all' || month2season[obj.month] == curSeason)){
