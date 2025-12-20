@@ -105,9 +105,8 @@
             <p class="modal-title">ตั้งค่าเส้นเขตแดน</p>
             <hr>
             <p class="modal-sub-title">จังหวัด</p>
-            <!-- <hr style="width: 80%;"> -->
-            <div class="multi-select center" id="multiSelect">
-                <div class="selected" id="selectedItems">
+            <div class="multi-select center" id="multiSelectProvince">
+                <div class="selected" id="selectedProvinceItems">
                     <span class="placeholder">Select Provinces</span>
                 </div>
                 <div class="dropdown hidden">
@@ -120,17 +119,40 @@
                 </div>
             </div>
             <p class="modal-sub-title">อำเภอ</p>
-            <hr style="width: 80%;">
+            <div class="multi-select center" id="multiSelectAmphoe">
+                <div class="selected" id="selectedAmphoeItems">
+                    <span class="placeholder">Select Amphoes</span>
+                </div>
+                <div class="dropdown hidden">
+                    <input type="text" class="search" placeholder="Search...">
+                    <div class="action-bar">
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
+                    </div>
+                    <ul class="options"></ul>
+                </div>
+            </div>
             <p class="modal-sub-title">ตำบล</p>
-            <hr style="width: 80%;">
+            <div class="multi-select center" id="multiSelectTambon">
+                <div class="selected" id="selectedTambonItems">
+                    <span class="placeholder">Select Tambons</span>
+                </div>
+                <div class="dropdown hidden">
+                    <input type="text" class="search" placeholder="Search...">
+                    <div class="action-bar">
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
+                    </div>
+                    <ul class="options"></ul>
+                </div>
+            </div>
             <p class="modal-sub-title">เขตเขาแผงม้า</p>
             <hr style="width: 80%;">
-            <p>Show Border</p>
-            <input type="checkbox" name="" id="showBorder">
+            <p class="mapOptions">Show Border</p>
+            <input type="checkbox" id="showBorder">
             <span>show</span>
-            <br>
-            <p>Border Color</p>
-            <input disabled type="color" name="" value="#ff0000" id="borderColor">
+            <p class="mapOptions">Border Color</p>
+            <input disabled type="color" value="#ff0000" id="borderColor">
             <br>
         </div>
     </div>
@@ -171,14 +193,16 @@
 
         const data = await loadData();
 
-        const multiSelect = document.getElementById("multiSelect");
-        const selectedBox = document.getElementById("selectedItems");
-        const dropdown = multiSelect.querySelector(".dropdown");
-        const searchInput = multiSelect.querySelector(".search");
-        const optionsList = multiSelect.querySelector(".options");
+        const multiSelectProvince = document.getElementById("multiSelectProvince");
+        const selectedBox = document.getElementById("selectedProvinceItems");
+        const dropdown = multiSelectProvince.querySelector(".dropdown");
+        const searchInput = multiSelectProvince.querySelector(".search");
+        const optionsList = multiSelectProvince.querySelector(".options");
 
         let selected = new Set();
         let provinceBorderLayers = {};
+        let amphoeBorderLayers = {};
+        let tambonBorderLayers = {};
 
         async function renderProvinceBorders(){
             Object.values(provinceBorderLayers).forEach(layer => {
@@ -289,7 +313,7 @@
         };
 
         document.addEventListener("click", (e) => {
-            if (!multiSelect.contains(e.target)) {
+            if (!multiSelectProvince.contains(e.target)) {
                 dropdown.classList.add("hidden");
             }
         });
