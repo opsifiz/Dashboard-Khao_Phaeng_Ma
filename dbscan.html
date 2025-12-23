@@ -414,7 +414,7 @@
 
                 li.onclick = () => {
                     tambonsSelected.has(value) ? tambonsSelected.delete(value) : tambonsSelected.add(value);
-                    renderSelectedAmphoe();
+                    renderSelectedTambon();
                     renderTambonOptions(searchTambonInput.value);
                     renderBorders();
                 };
@@ -502,7 +502,7 @@
         function renderSelectedTambon() {
             selectedTambonBox.innerHTML = "";
             if (tambonsSelected.size === 0) {
-                selectedTambonBox.innerHTML = `<span class="placeholder">Select Amphoes</span>`;
+                selectedTambonBox.innerHTML = `<span class="placeholder">Select Tambons</span>`;
                 return;
             }
             tambonsSelected.forEach(value => {
@@ -524,9 +524,9 @@
                 removeBtn.onclick = (e) => {
                     e.stopPropagation();
                     const v = tag.dataset.value;
-                    amphoesSelected.delete(v);
-                    renderSelectedAmphoe();
-                    renderAmphoeOptions(searchTambonInput.value);
+                    tambonsSelected.delete(v);
+                    renderSelectedTambon();
+                    renderTambonOptions(searchTambonInput.value);
                     renderBorders();
                 };
 
