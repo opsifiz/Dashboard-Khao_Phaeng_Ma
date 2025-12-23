@@ -109,13 +109,13 @@
                 <div class="selected" id="selectedProvinceItems">
                     <span class="placeholder">Select Provinces</span>
                 </div>
-                <div class="dropdown hidden">
-                    <input type="text" class="search" placeholder="Search...">
+                <div id="provinceDropdown" class="dropdown hidden">
+                    <input type="text" id="searchProvince" class="search" placeholder="Search...">
                     <div class="action-bar">
-                        <button class="btn-select-all">All</button>
-                        <button class="btn-clear-all">Clear</button>
+                        <button id="selectAllProvinces" class="btn-select-all">All</button>
+                        <button id="clearAllProvinces" class="btn-clear-all">Clear</button>
                     </div>
-                    <ul class="options"></ul>
+                    <ul id="provinceOptionList" class="options"></ul>
                 </div>
             </div>
             <p class="modal-sub-title">อำเภอ</p>
@@ -123,13 +123,13 @@
                 <div class="selected" id="selectedAmphoeItems">
                     <span class="placeholder">Select Amphoes</span>
                 </div>
-                <div class="dropdown hidden">
-                    <input type="text" class="search" placeholder="Search...">
+                <div id="amphoeDropdown" class="dropdown hidden">
+                    <input type="text" id="searchAmphoe" class="search" placeholder="Search...">
                     <div class="action-bar">
-                        <button class="btn-select-all">All</button>
-                        <button class="btn-clear-all">Clear</button>
+                        <button id="selectAllAmphoes" class="btn-select-all">All</button>
+                        <button id="clearAllAmphoes" class="btn-clear-all">Clear</button>
                     </div>
-                    <ul class="options"></ul>
+                    <ul id="amphoeOptionList" class="options"></ul>
                 </div>
             </div>
             <p class="modal-sub-title">ตำบล</p>
@@ -137,13 +137,13 @@
                 <div class="selected" id="selectedTambonItems">
                     <span class="placeholder">Select Tambons</span>
                 </div>
-                <div class="dropdown hidden">
-                    <input type="text" class="search" placeholder="Search...">
+                <div id="tambonDropdown" class="dropdown hidden">
+                    <input type="text" id="searchTambon" class="search" placeholder="Search...">
                     <div class="action-bar">
-                        <button class="btn-select-all">All</button>
-                        <button class="btn-clear-all">Clear</button>
+                        <button id="selectAllTambon" class="btn-select-all">All</button>
+                        <button id="clearAllTanbom" class="btn-clear-all">Clear</button>
                     </div>
-                    <ul class="options"></ul>
+                    <ul id="tambonOptionList" class="options"></ul>
                 </div>
             </div>
             <p class="modal-sub-title">เขตเขาแผงม้า</p>
@@ -157,63 +157,119 @@
         </div>
     </div>
     <script type="module">
+        import { loadData } from "./scripts/loadData.js";
+
+        let provincesSelected = new Set();
+        let amphoesSelected = new Set();
+        let tambonsSelected = new Set();
+        let provinceBorderLayers = {};
+        let amphoeBorderLayers = {};
+        let tambonBorderLayers = {};
+
+        const provinces = await loadData("provinces");
+        const amphoes = await loadData("amphoes");
+        const tambons = await loadData("tambons");
+
         const showBorderBtn = document.getElementById("showBorder");
         const borderColorValue = document.getElementById("borderColor");
 
-        const selectAllBtn = document.querySelector(".btn-select-all");
-        const clearAllBtn = document.querySelector(".btn-clear-all");
+        const selectAllProvincesBtn = document.getElementById("selectAllProvinces");
+        const clearAllProvincesBtn = document.getElementById("clearAllProvinces");
 
-        selectAllBtn.onclick = () => {
-            data.forEach(item => selected.add(item.value));
-            renderSelected();
-            renderOptions(searchInput.value);
-            renderProvinceBorders();
+        const selectAllAmphoesBtn = document.getElementById("selectAllAmphoes");
+        const clearAllAmphoesBtn = document.getElementById("clearAllAmphoes");
+
+        const selectAllTambonBtn = document.getElementById("selectAllTambon");
+        const clearAllTambonBtn = document.getElementById("clearAllTanbom");
+
+        selectAllProvincesBtn.onclick = () => {
+            provinces.forEach(item => provincesSelected.add(item.value));
+            renderSelectedProvince();
+            renderProvinceOptions(searchProvinceInput.value);
+            renderBorders();
         };
         
-        clearAllBtn.onclick = () => {
-            selected.clear();
-            renderSelected();
-            renderOptions(searchInput.value);
-            renderProvinceBorders();
+        clearAllProvincesBtn.onclick = () => {
+            provincesSelected.clear();
+            renderSelectedProvince();
+            renderProvinceOptions(searchProvinceInput.value);
+            renderBorders();
         };
 
-        showBorderBtn.addEventListener("change", renderProvinceBorders);
-        borderColorValue.addEventListener("input", renderProvinceBorders);
+        selectAllAmphoesBtn.onclick = () => {
+            amphoes.forEach(item => amphoesSelected.add(item.value));
+            renderSelectedAmphoe();
+            renderAmphoeOptions(searchAmphoeInput.value);
+            renderBorders();
+        };
+        
+        clearAllAmphoesBtn.onclick = () => {
+            amphoesSelected.clear();
+            renderSelectedAmphoe();
+            renderAmphoeOptions(searchAmphoeInput.value);
+            renderBorders();
+        };
 
+        selectAllTambonBtn.onclick = () => {
+            tambons.forEach(item => tambonsSelected.add(item.value));
+            renderSelectedTambon();
+            renderTambonOptions(searchTambonInput.value);
+            renderBorders();
+        };
+        
+        clearAllTambonBtn.onclick = () => {
+            tambonsSelected.clear();
+            renderSelectedTambon();
+            renderTambonOptions(searchTambonInput.value);
+            renderBorders();
+        };
+
+        showBorderBtn.addEventListener("change", renderBorders);
+        borderColorValue.addEventListener("input", renderBorders);
 
         showBorderBtn.addEventListener("change", ()=>{
             const value = showBorderBtn.checked;
             borderColorValue.disabled = !value;
         });
 
-        async function loadData(){
-            const data = await fetch("./data/provinces.json").then(response => response.json());
-            return data.map(p => ({label: p.name_en, value: p.name_en.toLowerCase().replace(/\s+/g, '_')}));
-        }
-
-        const data = await loadData();
-
         const multiSelectProvince = document.getElementById("multiSelectProvince");
-        const selectedBox = document.getElementById("selectedProvinceItems");
-        const dropdown = multiSelectProvince.querySelector(".dropdown");
-        const searchInput = multiSelectProvince.querySelector(".search");
-        const optionsList = multiSelectProvince.querySelector(".options");
+        const multiSelectAmphoe = document.getElementById("multiSelectAmphoe");
+        const multiSelectTambon = document.getElementById("multiSelectTambon");
 
-        let selected = new Set();
-        let provinceBorderLayers = {};
-        let amphoeBorderLayers = {};
-        let tambonBorderLayers = {};
+        const selectedProvinceBox = document.getElementById("selectedProvinceItems");
+        const selectedAmphoeBox = document.getElementById("selectedAmphoeItems");
+        const selectedTambonBox = document.getElementById("selectedTambonItems");
 
-        async function renderProvinceBorders(){
+        const dropdownProvince = document.getElementById("provinceDropdown");
+        const dropdownAmphoe = document.getElementById("amphoeDropdown");
+        const dropdownTambon = document.getElementById("tambonDropdown");
+
+        const searchProvinceInput = document.getElementById("searchProvince");
+        const searchAmphoeInput = document.getElementById("searchAmphoe");
+        const searchTambonInput = document.getElementById("searchTambon");
+
+        const provinceOptionList = document.getElementById("provinceOptionList");
+        const amphoeOptionList = document.getElementById("amphoeOptionList");
+        const tambonOptionList = document.getElementById("tambonOptionList");
+
+        async function renderBorders(){
             Object.values(provinceBorderLayers).forEach(layer => {
+                if(map.hasLayer(layer)) map.removeLayer(layer);
+            });
+            Object.values(amphoeBorderLayers).forEach(layer => {
+                if(map.hasLayer(layer)) map.removeLayer(layer);
+            });
+            Object.values(tambonBorderLayers).forEach(layer => {
                 if(map.hasLayer(layer)) map.removeLayer(layer);
             });
 
             provinceBorderLayers = {};
+            amphoeBorderLayers = {};
+            tambonBorderLayers = {};
 
             if(!showBorderBtn.checked) return;
 
-            for(const value of selected){
+            for(const value of provincesSelected){
                 try{
                     const res = await fetch(`./border/province/${value}.geojson`);
                     if(!res.ok){
@@ -236,11 +292,59 @@
                     console.error(err);
                 }
             }
+
+            for(const value of amphoesSelected){
+                try{
+                    const res = await fetch(`./border/amphoe/${value}.geojson`);
+                    if(!res.ok){
+                        console.error(`Failed to fetch ./border/province/${value}.geojson`);
+                        continue;
+                    }
+
+                    const geojson = await res.json();
+
+                    const layer = L.geoJSON(geojson, {
+                        style: {
+                            color: borderColorValue.value,
+                            weight: 2,
+                            fillOpacity: 0
+                        }
+                    }).addTo(map);
+
+                    amphoeBorderLayers[value] = layer;
+                }catch(err){
+                    console.error(err);
+                }
+            }
+
+            for(const value of tambonsSelected){
+                try{
+                    const res = await fetch(`./border/tambon/${value}.geojson`);
+                    if(!res.ok){
+                        console.error(`Failed to fetch ./border/province/${value}.geojson`);
+                        continue;
+                    }
+
+                    const geojson = await res.json();
+
+                    const layer = L.geoJSON(geojson, {
+                        style: {
+                            color: borderColorValue.value,
+                            weight: 2,
+                            fillOpacity: 0
+                        }
+                    }).addTo(map);
+
+                    tambonBorderLayers[value] = layer;
+                }catch(err){
+                    console.error(err);
+                }
+            }
         }
 
-        function renderOptions(filter = "") {
-            optionsList.innerHTML = "";
-            data
+        function renderProvinceOptions(filter = "") {
+            provinceOptionList.innerHTML = "";
+            provinces
             .filter(item => item.label.toLowerCase().includes(filter.toLowerCase()))
             .forEach(item => {
                 const label = item.label;
@@ -250,29 +354,83 @@
                 li.textContent = label;
                 li.dataset.value = value;
 
-                if (selected.has(value)) {
+                if (provincesSelected.has(value)) {
                     li.style.fontWeight = "bold";
                 }
 
                 li.onclick = () => {
-                    selected.has(value) ? selected.delete(value) : selected.add(value);
-                    renderSelected();
-                    renderOptions(searchInput.value);
-                    renderProvinceBorders();
+                    provincesSelected.has(value) ? provincesSelected.delete(value) : provincesSelected.add(value);
+                    renderSelectedProvince();
+                    renderProvinceOptions(searchProvinceInput.value);
+                    renderBorders();
                 };
 
-                optionsList.appendChild(li);
+                provinceOptionList.appendChild(li);
             });
         }
 
-        function renderSelected() {
-            selectedBox.innerHTML = "";
-            if (selected.size === 0) {
-                selectedBox.innerHTML = `<span class="placeholder">Select Provinces</span>`;
+        function renderAmphoeOptions(filter = "") {
+            amphoeOptionList.innerHTML = "";
+            amphoes
+            .filter(item => item.label.toLowerCase().includes(filter.toLowerCase()))
+            .forEach(item => {
+                const label = item.label;
+                const value = item.value;
+                
+                const li = document.createElement("li");
+                li.textContent = label;
+                li.dataset.value = value;
+
+                if (amphoesSelected.has(value)) {
+                    li.style.fontWeight = "bold";
+                }
+
+                li.onclick = () => {
+                    amphoesSelected.has(value) ? amphoesSelected.delete(value) : amphoesSelected.add(value);
+                    renderSelectedAmphoe();
+                    renderAmphoeOptions(searchAmphoeInput.value);
+                    renderBorders();
+                };
+
+                amphoeOptionList.appendChild(li);
+            });
+        }
+
+        function renderTambonOptions(filter = "") {
+            tambonOptionList.innerHTML = "";
+            tambons
+            .filter(item => item.label.toLowerCase().includes(filter.toLowerCase()))
+            .forEach(item => {
+                const label = item.label;
+                const value = item.value;
+                
+                const li = document.createElement("li");
+                li.textContent = label;
+                li.dataset.value = value;
+
+                if (tambonsSelected.has(value)) {
+                    li.style.fontWeight = "bold";
+                }
+
+                li.onclick = () => {
+                    tambonsSelected.has(value) ? tambonsSelected.delete(value) : tambonsSelected.add(value);
+                    renderSelectedAmphoe();
+                    renderTambonOptions(searchTambonInput.value);
+                    renderBorders();
+                };
+
+                tambonOptionList.appendChild(li);
+            });
+        }
+
+        function renderSelectedProvince() {
+            selectedProvinceBox.innerHTML = "";
+            if (provincesSelected.size === 0) {
+                selectedProvinceBox.innerHTML = `<span class="placeholder">Select Provinces</span>`;
                 return;
             }
-            selected.forEach(value => {
-                const label = data.find(d => d.value === value).label;
+            provincesSelected.forEach(value => {
+                const label = provinces.find(d => d.value === value).label;
 
                 const tag = document.createElement("span");
                 tag.className = "tag";
@@ -290,35 +448,137 @@
                 removeBtn.onclick = (e) => {
                     e.stopPropagation();
                     const v = tag.dataset.value;
-                    selected.delete(v);
+                    provincesSelected.delete(v);
                     renderSelected();
-                    renderOptions(searchInput.value);
-                    renderProvinceBorders();
+                    renderProvinceOptions(searchProvinceInput.value);
+                    renderBorders();
                 };
 
                 tag.appendChild(text);
                 tag.appendChild(removeBtn);
-                selectedBox.appendChild(tag);
+                selectedProvinceBox.appendChild(tag);
             });
-            console.log(selected);
+            console.log(provincesSelected);
         }
 
-        selectedBox.onclick = () => {
-            dropdown.classList.toggle("hidden");
-            searchInput.focus();
+        function renderSelectedAmphoe() {
+            selectedAmphoeBox.innerHTML = "";
+            if (amphoesSelected.size === 0) {
+                selectedAmphoeBox.innerHTML = `<span class="placeholder">Select Amphoes</span>`;
+                return;
+            }
+            amphoesSelected.forEach(value => {
+                const label = amphoes.find(d => d.value === value).label;
+
+                const tag = document.createElement("span");
+                tag.className = "tag";
+                tag.dataset.value = value;
+
+                const text = document.createElement("span");
+                text.innerText = label;
+
+                const removeBtn = document.createElement("span");
+                removeBtn.innerText = "X";
+                removeBtn.style.cursor = "pointer";
+                removeBtn.style.marginLeft = "4px";
+                removeBtn.style.color = "red";
+
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const v = tag.dataset.value;
+                    amphoesSelected.delete(v);
+                    renderSelectedAmphoe();
+                    renderAmphoeOptions(searchAmphoeInput.value);
+                    renderBorders();
+                };
+
+                tag.appendChild(text);
+                tag.appendChild(removeBtn);
+                selectedAmphoeBox.appendChild(tag);
+            });
+            console.log(amphoesSelected);
+        }
+
+        function renderSelectedTambon() {
+            selectedTambonBox.innerHTML = "";
+            if (tambonsSelected.size === 0) {
+                selectedTambonBox.innerHTML = `<span class="placeholder">Select Amphoes</span>`;
+                return;
+            }
+            tambonsSelected.forEach(value => {
+                const label = amphoes.find(d => d.value === value).label;
+
+                const tag = document.createElement("span");
+                tag.className = "tag";
+                tag.dataset.value = value;
+
+                const text = document.createElement("span");
+                text.innerText = label;
+
+                const removeBtn = document.createElement("span");
+                removeBtn.innerText = "X";
+                removeBtn.style.cursor = "pointer";
+                removeBtn.style.marginLeft = "4px";
+                removeBtn.style.color = "red";
+
+                removeBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    const v = tag.dataset.value;
+                    amphoesSelected.delete(v);
+                    renderSelectedAmphoe();
+                    renderAmphoeOptions(searchTambonInput.value);
+                    renderBorders();
+                };
+
+                tag.appendChild(text);
+                tag.appendChild(removeBtn);
+                selectedTambonBox.appendChild(tag);
+            });
+            console.log(tambonsSelected);
+        }
+
+        selectedProvinceBox.onclick = () => {
+            dropdownProvince.classList.toggle("hidden");
+            searchProvinceInput.focus();
         };
 
-        searchInput.oninput = (e) => {
-            renderOptions(e.target.value);
+        selectedAmphoeBox.onclick = () => {
+            dropdownAmphoe.classList.toggle("hidden");
+            searchAmphoeInput.focus();
+        };
+        
+        selectedTambonBox.onclick = () => {
+            dropdownTambon.classList.toggle("hidden");
+            searchTambonInput.focus();
+        };
+
+        searchProvinceInput.oninput = (e) => {
+            renderProvinceOptions(e.target.value);
+        };
+
+        searchAmphoeInput.oninput = (e) => {
+            renderAmphoeOptions(e.target.value);
+        };
+
+        searchTambonInput.oninput = (e) => {
+            renderTambonOptions(e.target.value);
         };
 
         document.addEventListener("click", (e) => {
             if (!multiSelectProvince.contains(e.target)) {
-                dropdown.classList.add("hidden");
+                dropdownProvince.classList.add("hidden");
+            }
+            if (!multiSelectAmphoe.contains(e.target)) {
+                dropdownAmphoe.classList.add("hidden");
+            }
+            if (!multiSelectTambon.contains(e.target)) {
+                dropdownTambon.classList.add("hidden");
             }
         });
 
-        renderOptions();
+        renderProvinceOptions();
+        renderAmphoeOptions();
+        renderTambonOptions();
     </script>
 
     <script>
