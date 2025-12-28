@@ -136,8 +136,8 @@
                 <div id="provinceDropdown" class="dropdown hidden">
                     <input type="text" id="searchProvince" class="search" placeholder="Search...">
                     <div class="action-bar">
-                        <button id="selectAllProvinces" class="btn-select-all">All</button>
-                        <button id="clearAllProvinces" class="btn-clear-all">Clear</button>
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
                     </div>
                     <ul id="provinceOptionList" class="options"></ul>
                 </div>
@@ -150,8 +150,8 @@
                 <div id="amphoeDropdown" class="dropdown hidden">
                     <input type="text" id="searchAmphoe" class="search" placeholder="Search...">
                     <div class="action-bar">
-                        <button id="selectAllAmphoes" class="btn-select-all">All</button>
-                        <button id="clearAllAmphoes" class="btn-clear-all">Clear</button>
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
                     </div>
                     <ul id="amphoeOptionList" class="options"></ul>
                 </div>
@@ -164,13 +164,26 @@
                 <div id="tambonDropdown" class="dropdown hidden">
                     <input type="text" id="searchTambon" class="search" placeholder="Search...">
                     <div class="action-bar">
-                        <button id="selectAllTambon" class="btn-select-all">All</button>
-                        <button id="clearAllTanbom" class="btn-clear-all">Clear</button>
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
                     </div>
                     <ul id="tambonOptionList" class="options"></ul>
                 </div>
             </div>
-            <p class="modal-sub-title">เขตเขาแผงม้า</p>
+            <p class="modal-sub-title">แนวเขตป่าอนุรักษ์</p>
+            <div class="multi-select center" id="multiSelectArea">
+                <div class="selected" id="selectedAreaItems">
+                    <span class="placeholder">Select Area</span>
+                </div>
+                <div id="areaDropdown" class="dropdown hidden">
+                    <input type="text" id="searchArea" class="search" placeholder="Search...">
+                    <div class="action-bar">
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
+                    </div>
+                    <ul id="areaOptionList" class="options"></ul>
+                </div>
+            </div>
             <hr style="width: 80%;">
             <p class="mapOptions">Show Border</p>
             <input type="checkbox" id="showBorder">
@@ -186,25 +199,37 @@
         let provincesSelected = new Set();
         let amphoesSelected = new Set();
         let tambonsSelected = new Set();
+        let araeSelected = new Set();
+
         let provinceBorderLayers = {};
         let amphoeBorderLayers = {};
         let tambonBorderLayers = {};
+        let areaBorderLayers = {};
 
         const provinces = await loadData("provinces");
         const amphoes = await loadData("amphoes");
         const tambons = await loadData("tambons");
+        const areaa = await loadData("areas");
+
+        const Provinces = document.getElementById("multiSelectProvince");
+        const Amphoes = document.getElementById("multiSelectAmphoe");
+        const Tambons = document.getElementById("multiSelectTambon");
+        const Areas = document.getElementById("multiSelectArea");
 
         const showBorderBtn = document.getElementById("showBorder");
         const borderColorValue = document.getElementById("borderColor");
 
-        const selectAllProvincesBtn = document.getElementById("selectAllProvinces");
-        const clearAllProvincesBtn = document.getElementById("clearAllProvinces");
+        const selectAllProvincesBtn = Provinces.querySelector(".btn-select-all");
+        const clearAllProvincesBtn = Provinces.querySelector(".btn-clear-all");
 
-        const selectAllAmphoesBtn = document.getElementById("selectAllAmphoes");
-        const clearAllAmphoesBtn = document.getElementById("clearAllAmphoes");
+        const selectAllAmphoesBtn = Amphoes.querySelector(".btn-select-all");
+        const clearAllAmphoesBtn = Amphoes.querySelector(".btn-clear-all");
 
-        const selectAllTambonBtn = document.getElementById("selectAllTambon");
-        const clearAllTambonBtn = document.getElementById("clearAllTanbom");
+        const selectAllTambonBtn = Tambons.querySelector(".btn-select-all");
+        const clearAllTambonBtn = Tambons.querySelector(".btn-clear-all");
+
+        const selectAllArea = Areas.querySelector(".btn-select-all");
+        const clearAllArea = Areas.querySelector(".btn-clear-all");
 
         selectAllProvincesBtn.onclick = () => {
             provinces.forEach(item => provincesSelected.add(item.value));
