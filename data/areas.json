@@ -1,0 +1,26 @@
+[
+  {
+    "dnp_code": 1040,
+    "name_en": "Thap Lan",
+    "name_th": "เธเธฑเธเธฅเธฒเธ",
+    "file": "thap_lan.geojson"
+  },
+  {
+    "dnp_code": 1001,
+    "name_en": "Khao Yai",
+    "name_th": "เนเธเธฒเนเธซเธเน",
+    "file": "khao_yai.geojson"
+  },
+  {
+    "dnp_code": 3068,
+    "name_en": "Pa Kho Puluang",
+    "name_th": "เธเนเธฒเนเธเธฒเธเธนเธซเธฅเธงเธ",
+    "file": "pa_kho_puluang.geojson"
+  },
+  {
+    "dnp_code": 3062,
+    "name_en": "Khao Phaeng Ma",
+    "name_th": "เนเธเธฒเนเธเธเธกเนเธฒ",
+    "file": "khao_phaeng_ma.geojson"
+  }
+]
