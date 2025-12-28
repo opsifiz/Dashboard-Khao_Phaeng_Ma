@@ -47,28 +47,28 @@
 </head>
 <body>
     <div id="controls">
-        <label for="animalSelect">เลือกสัตว์:</label>
-        <select id="animalSelect">
-            <option value="all">ทั้งหมด</option>
-        </select>
-        <label for="yearSelect">เลือกฤดู:</label>
-        <select id="seasonSelect"></select>
-        <label for="monthSelect">เลือกเดือน:</label>
-        <select id="monthSelect">
-            <option value="all">ทั้งหมด</option>
-            <option value="1">ม.ค.</option>
-            <option value="2">ก.พ.</option>
-            <option value="3">มี.ค.</option>
-            <option value="4">เม.ษ.</option>
-            <option value="5">พ.ค.</option>
-            <option value="6">มิ.ย.</option>
-            <option value="7">ก.ค.</option>
-            <option value="8">ส.ค.</option>
-            <option value="9">ก.ย.</option>
-            <option value="10">ต.ค.</option>
-            <option value="11">พ.ย.</option>
-            <option value="12">ธ.ค.</option>
-        </select>
+        <div class="animalSelect">
+            <label for="animalSelect">เลือกสัตว์:</label>
+            <select id="animalSelect">
+                <option value="all">ทั้งหมด</option>
+            </select>
+        </div>
+
+        <div class="classifySelect">
+            <label for="classify">จำแนก</label>
+            <select id="classify"></select>
+        </div>
+        
+        <div class="monthSelect">
+            <label for="monthSelect">เลือกเดือน:</label>
+            <select id="monthSelect"></select>
+        </div>
+        
+        <div class="seasonSelect">
+            <label for="seasonSelect">เลือกฤดู:</label>
+            <select id="seasonSelect"></select>
+        </div>
+
         <label for="yearSelect">เลือกปี:</label>
         <select id="yearSelect">
             <option value="all">ทั้งหมด</option>
@@ -76,14 +76,18 @@
             <option value="2567">2567</option>
             <option value="2568">2568</option>
         </select>
+
         <label for="colorSelect">แยกสีตาม:</label>
         <select id="colorSelect">
             <option value="animal">สัตว์</option>
             <option value="month" selected>เดือน</option>
             <option value="year">ปี</option>
         </select>
-        <label for="mapSelect">ประเภทแผนที่:</label>
-        <select id="mapSelect"></select>
+        
+        <div class="mapSelect">
+            <label for="mapSelect">ประเภทแผนที่:</label>
+            <select id="mapSelect"></select>
+        </div>
     </div>
     <div id="map"></div>
     <div class="floating-rect modal1" id="rect1" style="top: 20px; right: 20px;">

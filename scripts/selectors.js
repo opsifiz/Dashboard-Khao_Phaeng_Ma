@@ -49,6 +49,34 @@ const maps = {
 // Animal Selector
 let curAnimal = "all";
 
+// Month Selector
+let curMonth = "all";
+const selectMonth = document.getElementById("monthSelect");
+
+const monthChoices = [
+    {label: "ทั้งหมด", value: "all"},
+    {label: "ม.ค.", value: "1"},
+    {label: "ก.พ.", value: "2"},
+    {label: "มี.ค.", value: "3"},
+    {label: "เม.ษ.", value: "4"},
+    {label: "พ.ค.", value: "5"},
+    {label: "มิ.ย.", value: "6"},
+    {label: "ก.ค.", value: "7"},
+    {label: "ส.ค.", value: "8"},
+    {label: "ก.ย.", value: "9"},
+    {label: "ต.ค", value: "10"},
+    {label: "พ.ย.", value: "11"},
+    {label: "ธ.ค.", value: "12"},
+];
+
+monthChoices.forEach((obj) => {
+    const choice = document.createElement("option");
+    choice.innerText = obj.label;
+    choice.value = obj.value;
+    
+    selectMonth.appendChild(choice);
+});
+
 // Season Selector
 let curSeason = "all"; //Default Value
 const selectSeason = document.getElementById("seasonSelect");
@@ -82,6 +110,7 @@ selectSeason.addEventListener("change", () => {
 //Classify Selector
 let curClassify = "month";
 const selectClassify = document.getElementById("classify");
+document.querySelector(".seasonSelect").style.display = "none";
 
 const classifyChoices = [
     {label: "รายเดือน", value: "month"},
@@ -134,12 +163,16 @@ selectClassify.addEventListener("change", ()=>{
         <span style="color:#4c4c4c">■</span> พฤศจิกายน<br>
         <span style="color:#000000">■</span> ธันวาคม<br>
         `;
+        document.querySelector(".monthSelect").style.display = "block";
+        document.querySelector(".seasonSelect").style.display = "none";
     }else if(curClassify == "season"){
         document.getElementById('moreInfo').innerHTML = `
         <span style="color:#FF0000">■</span> ฤดูร้อน<br>
         <span style="color:#00FF00">■</span> ฤดูฝน<br>
         <span style="color:#0000FF">■</span> ฤดูหนาว<br>
         `;
+        document.querySelector(".monthSelect").style.display = "none";
+        document.querySelector(".seasonSelect").style.display = "block";
     }
 });
 
@@ -148,8 +181,8 @@ let curMap = maps.osm; //Default Value
 const selectMap = document.getElementById("mapSelect");
 
 const mapChoices = [
-    {label: "OpenStreetMap", value: "osm"},
-    {label: "Satellite", value: "sat"},
+    {label: "Street View", value: "osm"},
+    {label: "Satellite View", value: "sat"},
 ];
 
 mapChoices.forEach((obj) => {

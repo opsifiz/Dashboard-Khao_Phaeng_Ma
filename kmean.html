@@ -47,18 +47,37 @@
 </head>
 <body>
     <div id="controls">
-        <label for="animalSelect">เลือกสัตว์:</label>
-        <select id="animalSelect">
-            <option value="all">ทั้งหมด</option>
-        </select>
-        <label for="yearSelect">เลือกฤดู:</label>
-        <select id="seasonSelect"></select>
-        <label for="classify">จำแนก</label>
-        <select id="classify"></select>
-        <label for="mapSelect">ประเภทแผนที่:</label>
-        <select id="mapSelect"></select>
-        <label for="clustering">จัดกลุ่ม:</label>
-        <button id="runBtn">ทำงาน</button>
+        <div class="animalSelect">
+            <label for="animalSelect">เลือกสัตว์:</label>
+            <select id="animalSelect">
+                <option value="all">ทั้งหมด</option>
+            </select>
+        </div>
+
+        <div class="classifySelect">
+            <label for="classify">จำแนก</label>
+            <select id="classify"></select>
+        </div>
+        
+        <div class="monthSelect">
+            <label for="monthSelect">เลือกเดือน:</label>
+            <select id="monthSelect"></select>
+        </div>
+        
+        <div class="seasonSelect">
+            <label for="seasonSelect">เลือกฤดู:</label>
+            <select id="seasonSelect"></select>
+        </div>
+        
+        <div class="mapSelect">
+            <label for="mapSelect">ประเภทแผนที่:</label>
+            <select id="mapSelect"></select>
+        </div>
+
+        <div class="clustering">
+            <label for="clustering">จัดกลุ่ม:</label>
+            <button id="runBtn">ทำงาน</button>
+        </div>
     </div>
     <div id="map"></div>
     <div class="floating-rect modal1" id="rect1" style="top: 20px; right: 20px;">
