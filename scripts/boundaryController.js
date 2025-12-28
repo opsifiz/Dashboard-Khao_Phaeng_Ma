@@ -50,8 +50,8 @@ class BoundaryController{
     
     renderSelected(){
         this.selectedBox.innerHTML = "";
-        if (this.selectedBox.size === 0) {
-            this.selectedBox.innerHTML = `<span class="placeholder">Select ${this.type}s</span>`;
+        if (this.selected.size === 0) {
+            this.selectedBox.innerHTML = `<span class="placeholder">เลือก ${this.title}</span>`;
             return;
         }
         this.selected.forEach(value => {
@@ -86,9 +86,37 @@ class BoundaryController{
         console.log(this.selected);
     }
     
-    constructor(type){
+    createRoot(){
+        const wrapper = document.createElement("div");
+
+        wrapper.innerHTML = `
+            <p class="modal-sub-title">${this.title}</p>
+            <div class="multi-select center" id="${this.type}MultiSelect">
+                <div class="selected">
+                    <span class="placeholder">เลือก ${this.title}</span>
+                </div>
+                <div class="dropdown hidden">
+                    <input type="text" class="search" placeholder="Search...">
+                    <div class="action-bar">
+                        <button class="btn-select-all">All</button>
+                        <button class="btn-clear-all">Clear</button>
+                    </div>
+                    <ul id="${this.type}OptionList" class="options"></ul>
+                </div>
+            </div>
+        `;
+
+        return wrapper;
+    }
+
+    constructor(type, title){
         this.type = type;
-        this.multiSelect = document.getElementById(`${type}MultiSelect`);
+        this.title = title;
+
+        this.root = this.createRoot();
+        document.querySelector("section.boundary").appendChild(this.root);
+
+        this.multiSelect = this.root.querySelector(".multi-select");
     }
     
     async init(){
@@ -130,26 +158,23 @@ class BoundaryController{
 }
 
 const levels = [
-    "province",
-    "amphoe",
-    "tambon",
-    "area",
+    {type: "province", title: "จังหวัด"},
+    {type: "amphoe", title: "อำเภอ"},
+    {type: "tambon", title: "ตำบล"},
+    {type: "area", title: "แนวเขตป่าอนุรักษ์"},
 ];
 
 let multiSelect = {};
 
-levels.forEach(async level => {
-    multiSelect[level] = new BoundaryController(level);
-    await multiSelect[level].init();
+levels.forEach(async item => {
+    multiSelect[item.type] = new BoundaryController(item.type, item.title);
+    await multiSelect[item.type].init();
 
     document.addEventListener("click", (e) => {
-        if(!multiSelect[level].multiSelect.contains(e.target)){
-            multiSelect[level].dropdown.classList.add("hidden");
+        if(!multiSelect[item.type].multiSelect.contains(e.target)){
+            multiSelect[item.type].dropdown.classList.add("hidden");
         }
     });
-
-    // await multiSelect[level].renderOptions();
-    // console.log(multiSelect[level].optionList);
 });
 
 const showBorderBtn = document.getElementById("showBorder");
@@ -164,23 +189,20 @@ showBorderBtn.addEventListener("change", ()=>{
 });
 
 function renderBorders(){
-    levels.forEach((level) => {
-        Object.values(multiSelect[level].borderLayers).forEach(layer => {
+    levels.forEach((item) => {
+        Object.values(multiSelect[item.type].borderLayers).forEach(layer => {
             if(map.hasLayer(layer)) map.removeLayer(layer);
         });
 
-        multiSelect[level].borderLayers = {};
+        multiSelect[item.type].borderLayers = {};
     });
 
     if(!showBorderBtn.checked) return;
 
-    async () => {
-        
-    }
-    levels.forEach(async level => {
-        for(const value of multiSelect[level].selected){
+    levels.forEach(async item => {
+        for(const value of multiSelect[item.type].selected){
 
-            const path = `border/${level}/${value}.geojson`;
+            const path = `border/${item.type}/${value}.geojson`;
             try{
                 const res = await fetch(path);
                 if(!res.ok){
@@ -198,7 +220,7 @@ function renderBorders(){
                     }
                 }).addTo(map);
 
-                multiSelect[level].borderLayers[value] = layer;
+                multiSelect[item.type].borderLayers[value] = layer;
             }catch(err){
                 console.error(err);
             }
