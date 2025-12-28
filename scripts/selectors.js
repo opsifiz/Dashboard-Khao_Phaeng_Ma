@@ -35,6 +35,12 @@ const month2season = [
     "winter",
 ];
 
+const season2color = {
+    "summer": "#FF0000",
+    "rainy": "#00FF00",
+    "winter": "#0000FF",
+};
+
 const maps = {
     osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
     sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
@@ -73,6 +79,70 @@ selectSeason.addEventListener("change", () => {
     });
 });
 
+//Classify Selector
+let curClassify = "month";
+const selectClassify = document.getElementById("classify");
+
+const classifyChoices = [
+    {label: "รายเดือน", value: "month"},
+    {label: "รายฤดู", value: "season"},
+];
+
+classifyChoices.forEach((obj) => {
+    const choice = document.createElement("option");
+    choice.innerText = obj.label;
+    choice.value = obj.value;
+    
+    selectClassify.appendChild(choice);
+});
+
+selectClassify.addEventListener("change", ()=>{
+    curClassify = selectClassify.value;
+
+    animalLayers.forEach(obj => {
+        let iconUrl = "-";
+        if(curClassify === "month") {
+            iconUrl = `assets/${obj.type}_${name2hex[obj.month].slice(1)}.png`;
+        }else if (curClassify === "season") {
+            if (month2season[obj.month] === "summer") iconUrl = `assets/${obj.type}_FF0000.png`;
+            else if (month2season[obj.month] === "rainy") iconUrl = `assets/${obj.type}_00FF00.png`;
+            else if (month2season[obj.month] === "winter") iconUrl = `assets/${obj.type}_0000FF.png`;
+        }
+        if (obj.layer instanceof L.Marker) {
+            const newIcon = L.icon({
+                iconUrl: iconUrl,
+                iconSize: [10, 10],
+                iconAnchor: [10, 10],
+                popupAnchor: [10, 10]
+            });
+            obj.layer.setIcon(newIcon);
+        }
+    });
+
+    if(curClassify == "month"){
+        document.getElementById('moreInfo').innerHTML = `
+        <span style="color:#800000">■</span> มกราคม<br>
+        <span style="color:#FF0000">■</span> กุมภาพันธ์<br>
+        <span style="color:#FF7F00">■</span> มีนาคม<br>
+        <span style="color:#FFC0CB">■</span> เมษายน<br>
+        <span style="color:#FFFF00">■</span> พฤษภาคม<br>
+        <span style="color:#00FF00">■</span> มิถุนายน<br>
+        <span style="color:#0000FF">■</span> กรกฎาคม<br>
+        <span style="color:#8B00FF">■</span> สิงหาคม<br>
+        <span style="color:#4B0082">■</span> กันยายน<br>
+        <span style="color:#A9A9A9">■</span> ตุลาคม<br>
+        <span style="color:#4c4c4c">■</span> พฤศจิกายน<br>
+        <span style="color:#000000">■</span> ธันวาคม<br>
+        `;
+    }else if(curClassify == "season"){
+        document.getElementById('moreInfo').innerHTML = `
+        <span style="color:#FF0000">■</span> ฤดูร้อน<br>
+        <span style="color:#00FF00">■</span> ฤดูฝน<br>
+        <span style="color:#0000FF">■</span> ฤดูหนาว<br>
+        `;
+    }
+});
+
 // Map Selector
 let curMap = maps.osm; //Default Value
 const selectMap = document.getElementById("mapSelect");
@@ -89,7 +159,6 @@ mapChoices.forEach((obj) => {
     
     selectMap.appendChild(choice);
 });
-
 
 selectMap.addEventListener("change", ()=>{
     map.removeLayer(curMap);
