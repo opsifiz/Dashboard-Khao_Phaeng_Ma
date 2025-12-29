@@ -77,6 +77,18 @@ monthChoices.forEach((obj) => {
     selectMonth.appendChild(choice);
 });
 
+selectMonth.addEventListener("change", () => {
+    curMonth = selectMonth.value;
+    // console.log(curMonth);
+    animalLayers.forEach(obj => {
+        if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
+            if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
+        } else {
+            if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
+        }
+    });
+});
+
 // Year Selector
 let curYear = "all";
 const selectYear = document.getElementById("yearSelect");
@@ -95,7 +107,6 @@ yearChoices.forEach((obj) => {
     
     selectYear.appendChild(choice);
 });
-
 
 selectYear.addEventListener("change", () => {
     curYear = selectYear.value;
@@ -159,6 +170,13 @@ classifyChoices.forEach((obj) => {
 });
 
 selectClassify.addEventListener("change", ()=>{
+    selectMonth.value = "all";
+    selectYear.value = "all";
+    selectSeason.value = "all";
+    selectMonth.dispatchEvent(new Event("change"));
+    selectYear.dispatchEvent(new Event("change"));
+    selectSeason.dispatchEvent(new Event("change"));
+
     curClassify = selectClassify.value;
 
     animalLayers.forEach(obj => {
