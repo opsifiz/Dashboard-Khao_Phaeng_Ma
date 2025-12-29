@@ -64,18 +64,15 @@
             <select id="monthSelect"></select>
         </div>
         
+        <div class="yearSelect">
+            <label for="yearSelect">เลือกปี:</label>
+            <select id="yearSelect"></select>
+        </div>
+        
         <div class="seasonSelect">
             <label for="seasonSelect">เลือกฤดู:</label>
             <select id="seasonSelect"></select>
         </div>
-
-        <label for="yearSelect">เลือกปี:</label>
-        <select id="yearSelect">
-            <option value="all">ทั้งหมด</option>
-            <option value="2566">2566</option>
-            <option value="2567">2567</option>
-            <option value="2568">2568</option>
-        </select>
 
         <label for="colorSelect">แยกสีตาม:</label>
         <select id="colorSelect">
@@ -246,11 +243,6 @@
           });
 
           let curAnimal = "all";
-          let curMonth = "all";
-          let curYear = "all";
-
-          let xSum = 0;
-          let ySum = 0;
 
           selectAnimal.addEventListener("change", () => {
               curAnimal = selectAnimal.value;
@@ -260,30 +252,6 @@
                       if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
                       xSum += obj.X;
                       ySum += obj.Y;
-                  } else {
-                      if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
-                  }
-              });
-          });
-
-          selectMonths.addEventListener("change", () => {
-              curMonth = selectMonths.value;
-              // console.log(curMonth);
-              animalLayers.forEach(obj => {
-                  if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
-                      if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-                  } else {
-                      if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
-                  }
-              });
-          });
-
-          selectYears.addEventListener("change", () => {
-              curYear = selectYears.value;
-              // console.log(value);
-              animalLayers.forEach(obj => {
-                  if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
-                      if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
                   } else {
                       if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
                   }

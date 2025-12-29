@@ -77,6 +77,37 @@ monthChoices.forEach((obj) => {
     selectMonth.appendChild(choice);
 });
 
+// Year Selector
+let curYear = "all";
+const selectYear = document.getElementById("yearSelect");
+
+const yearChoices = [
+    {label: "ทั้งหมด", value: "all"},
+    {label: "2566", value: 2566},
+    {label: "2567", value: 2567},
+    {label: "2568", value: 2568},
+];
+
+yearChoices.forEach((obj) => {
+    const choice = document.createElement("option");
+    choice.innerText = obj.label;
+    choice.value = obj.value;
+    
+    selectYear.appendChild(choice);
+});
+
+
+selectYear.addEventListener("change", () => {
+    curYear = selectYear.value;
+    animalLayers.forEach(obj => {
+        if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
+            if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
+        } else {
+            if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
+        }
+    });
+});
+
 // Season Selector
 let curSeason = "all"; //Default Value
 const selectSeason = document.getElementById("seasonSelect");
@@ -110,10 +141,12 @@ selectSeason.addEventListener("change", () => {
 //Classify Selector
 let curClassify = "month";
 const selectClassify = document.getElementById("classify");
+document.querySelector(".yearSelect").style.display = "none";
 document.querySelector(".seasonSelect").style.display = "none";
 
 const classifyChoices = [
     {label: "รายเดือน", value: "month"},
+    {label: "รายปี", value: "year"},
     {label: "รายฤดู", value: "season"},
 ];
 
@@ -132,6 +165,10 @@ selectClassify.addEventListener("change", ()=>{
         let iconUrl = "-";
         if(curClassify === "month") {
             iconUrl = `assets/${obj.type}_${name2hex[obj.month].slice(1)}.png`;
+        }else if (curClassify === "year") {
+            if (obj.year === 2566) iconUrl = `assets/${obj.type}_FF0000.png`;
+            else if (obj.year === 2567) iconUrl = `assets/${obj.type}_0000FF.png`;
+            else if (obj.year === 2568) iconUrl = `assets/${obj.type}_00FF00.png`;
         }else if (curClassify === "season") {
             if (month2season[obj.month] === "summer") iconUrl = `assets/${obj.type}_FF0000.png`;
             else if (month2season[obj.month] === "rainy") iconUrl = `assets/${obj.type}_00FF00.png`;
@@ -163,17 +200,22 @@ selectClassify.addEventListener("change", ()=>{
         <span style="color:#4c4c4c">■</span> พฤศจิกายน<br>
         <span style="color:#000000">■</span> ธันวาคม<br>
         `;
-        document.querySelector(".monthSelect").style.display = "block";
-        document.querySelector(".seasonSelect").style.display = "none";
+    }else if(curClassify == "year"){
+        document.getElementById('moreInfo').innerHTML = `
+        <span style="color:#FF0000">■</span> 2566<br>
+        <span style="color:#0000FF">■</span> 2567<br>
+        <span style="color:#00FF00">■</span> 2568<br>
+        `;
     }else if(curClassify == "season"){
         document.getElementById('moreInfo').innerHTML = `
         <span style="color:#FF0000">■</span> ฤดูร้อน<br>
         <span style="color:#00FF00">■</span> ฤดูฝน<br>
         <span style="color:#0000FF">■</span> ฤดูหนาว<br>
         `;
-        document.querySelector(".monthSelect").style.display = "none";
-        document.querySelector(".seasonSelect").style.display = "block";
     }
+    document.querySelector(".monthSelect").style.display = (curClassify==="month"?"block":"none");
+    document.querySelector(".yearSelect").style.display = (curClassify==="year"?"block":"none");
+    document.querySelector(".seasonSelect").style.display = (curClassify==="season"?"block":"none");
 });
 
 // Map Selector
