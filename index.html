@@ -48,17 +48,17 @@
 <body>
     <div id="controls">
         <div class="animalSelect">
-            <label id="" for="animalSelect">สัตว์:</label>
+            <label id="animalLabel" for="animalSelect"></label>
             <select id="animalSelect"></select>
         </div>
 
         <div class="classifySelect">
-            <label id="" for="classify">จำแนก</label>
+            <label id="classifyLabel" for="classify"></label>
             <select id="classify"></select>
         </div>
         
         <div class="yearSelect">
-            <label id="" for="yearSelect">ปี:</label>
+            <label id="yearLabel" for="yearSelect"></label>
             <select id="yearSelect"></select>
         </div>
         
@@ -68,17 +68,22 @@
         </div>
         
         <div class="seasonSelect">
-            <label id="" for="seasonSelect">ฤดู:</label>
+            <label id="seasonLabel" for="seasonSelect"></label>
             <select id="seasonSelect"></select>
         </div>
 
         <div class="mapSelect">
-            <label id="" for="mapSelect">ประเภทแผนที่:</label>
+            <label id="mapLabel" for="mapSelect"></label>
             <select id="mapSelect"></select>
         </div>
 
+        <div class="clustering">
+            <label id="clusteringLabel" for="clustering"></label>
+            <button id="runClustering">ทำงาน</button>
+        </div>
+
         <div class="langSelect">
-            <label for="langSelect">ภาษา:</label>
+            <label id="langLabel" for="langSelect"></label>
             <select id="langSelect"></select>
         </div>
     </div>
@@ -186,9 +191,6 @@
           .openPopup();
 
           let animalLayers = [];
-          let animals = new Set();
-
-        animals.add("ทั้งหมด");
 
           fetch("./data/animals_data.json")
           .then(response => response.json())
@@ -208,8 +210,6 @@
                   let x = parseInt(row.X);
                   let y = parseInt(row.Y);
                   const [lon, lat] = proj4(utmProj, 'WGS84', [x, y]);
-
-                  animals.add(row.Type);
 
                   let shape = L.circleMarker([lat, lon], {
                       color: name2hex[month],
@@ -235,13 +235,6 @@
           const selectAnimal = document.getElementById("animalSelect");
           const selectMonths = document.getElementById("monthSelect");
           const selectYears = document.getElementById("yearSelect");
-
-          Array.from(animals).forEach(a => {
-              const opt = document.createElement("option");
-              opt.value = a;
-              opt.textContent = a;
-              selectAnimal.appendChild(opt);
-          });
 
           let curAnimal = "all";
 

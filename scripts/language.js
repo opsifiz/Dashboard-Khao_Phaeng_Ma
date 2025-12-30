@@ -2,7 +2,23 @@ let curLang = "th";
 
 export const languages = {
     "th":{
-        monthLabels: "เดือน:",
+        animalLabel: "สัตว์ป่า:",
+        animals: [
+            {label: "ทั้งหมด", value: "all"},
+            {label: "ช้างป่า", value: "ช้างป่า"},
+            {label: "ลิงกัง", value: "ลิงกัง"},
+            {label: "กระทิง", value: "กระทิง"},
+            {label: "เลียงผา", value: "เลียงผา"},
+            {label: "กวาง", value: "กวาง"},
+            {label: "หมีควาย", value: "หมีควาย"},
+        ],
+        classifyLabel: "จำแนก:",
+        classifys: [
+            {label: "รายเดือน", value: "month"},
+            {label: "รายปี", value: "year"},
+            {label: "รายฤดู", value: "season"},
+        ],
+        monthLabel: "เดือน:",
         months: [
             {label: "ทั้งหมด", value: "all"},
             {label: "ม.ค.", value: "1"},
@@ -18,9 +34,43 @@ export const languages = {
             {label: "พ.ย.", value: "11"},
             {label: "ธ.ค.", value: "12"},
         ],
+        yearLabel: "ปี:",
+        years: [
+            {label: "ทั้งหมด", value: "all"},
+            {label: "2566", value: 2566},
+            {label: "2567", value: 2567},
+            {label: "2568", value: 2568},
+        ],
+        seasonLabel: "ฤดู:",
+        seasons: [
+            {label: "ทั้งหมด", value: "all"},
+            {label: "ฤดูร้อน", value: "summer"},
+            {label: "ฤดูฝน", value: "rainy"},
+            {label: "ฤดูหนาว", value: "winter"},
+        ],
+        mapLabel: "ประเภทแผนที่:",
+        clusteringLabel: "จัดกลุ่ม:",
+        runClustering: "ทำงาน",
+        langLabel: "ภาษา:",
     },
     "en":{
-        monthLabels: "Month:",
+        animalLabel: "Wild Animal:",
+        animals: [
+            {label: "All", value: "all"},
+            {label: "Elephant", value: "ช้างป่า"},
+            {label: "Macaque", value: "ลิงกัง"},
+            {label: "Bull", value: "กระทิง"},
+            {label: "Chamois", value: "เลียงผา"},
+            {label: "Deer", value: "กวาง"},
+            {label: "Asiatic Black Bear", value: "หมีควาย"},
+        ],
+        classifyLabel: "Classify:",
+        classifys: [
+            // {label: "Monthly", value: "month"},
+            {label: "Yearly", value: "year"},
+            {label: "Seasonly", value: "season"},
+        ],
+        monthLabel: "Month:",
         months: [
             {label: "All", value: "all"},
             {label: "Jan", value: "1"},
@@ -36,12 +86,25 @@ export const languages = {
             {label: "Nov", value: "11"},
             {label: "Dec", value: "12"},
         ],
-
+        yearLabel: "Year:",
+        years: [
+            {label: "All", value: "all"},
+            {label: "2023", value: 2566},
+            {label: "2024", value: 2567},
+            {label: "2025", value: 2568},
+        ],
+        seasonLabel: "Season:",
+        seasons: [
+            {label: "All", value: "all"},
+            {label: "Summer", value: "summer"},
+            {label: "Rainy", value: "rainy"},
+            {label: "Winter", value: "winter"},
+        ],
+        mapLabel: "Map Type:",
+        clusteringLabel: "Cluster:",
+        runClustering: "Run",
+        langLabel: "Langauge:",
     }
-}
-
-export function translate(word){
-
 }
 
 export function setLang(value){

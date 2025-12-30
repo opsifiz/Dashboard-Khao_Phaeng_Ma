@@ -51,8 +51,21 @@ const maps = {
 function renderLang(){
     const lang = getLang();
 
+    // Animal Selector
+    document.getElementById("animalLabel").innerHTML = lang.animalLabel;
+    let animalChoices = lang.animals;
+    selectAnimal.innerHTML = "";
+
+    animalChoices.forEach((obj) => {
+        const choice = document.createElement("option");
+        choice.innerText = obj.label;
+        choice.value = obj.value;
+        
+        selectAnimal.appendChild(choice);
+    });
+
     // Month Selector
-    document.getElementById("monthLabel").innerHTML = lang.monthLabels;
+    document.getElementById("monthLabel").innerHTML = lang.monthLabel;
     let monthChoices = lang.months;
     selectMonth.innerHTML = "";
     
@@ -63,10 +76,60 @@ function renderLang(){
         
         selectMonth.appendChild(choice);
     });
+
+    // Year Selector
+    document.getElementById("yearLabel").innerHTML = lang.yearLabel;
+    const yearChoices = lang.years;
+    selectYear.innerHTML = "";
+
+    yearChoices.forEach((obj) => {
+        const choice = document.createElement("option");
+        choice.innerText = obj.label;
+        choice.value = obj.value;
+        
+        selectYear.appendChild(choice);
+    });
+
+    // Season Selector
+    document.getElementById("seasonLabel").innerHTML = lang.seasonLabel;
+    let seasonChoices = lang.seasons;
+    selectSeason.innerHTML = "";
+
+    seasonChoices.forEach((obj) => {
+        const choice = document.createElement("option");
+        choice.innerText = obj.label;
+        choice.value = obj.value;
+        
+        selectSeason.appendChild(choice);
+    });
+    
+    // Map Selector
+    document.getElementById("mapLabel").innerHTML = lang.mapLabel;
+    
+    // Classify Selector
+    document.getElementById("classifyLabel").innerHTML = lang.classifyLabel;
+    const classifyChoices = lang.classifys;
+    selectClassify.innerHTML = "";
+
+    classifyChoices.forEach((obj) => {
+        const choice = document.createElement("option");
+        choice.innerText = obj.label;
+        choice.value = obj.value;
+        
+        selectClassify.appendChild(choice);
+    });
+    
+    // Clustering
+    document.getElementById("clusteringLabel").innerHTML = lang.clusteringLabel;
+    document.getElementById("runClustering").innerHTML = lang.runClustering;
+
+    // Lang Selector
+    document.getElementById("langLabel").innerHTML = lang.langLabel;
 }
 
 // Animal Selector
 let curAnimal = "all";
+const selectAnimal = document.getElementById("animalSelect");
 
 // Month Selector
 let curMonth = "all";
@@ -88,21 +151,6 @@ selectMonth.addEventListener("change", () => {
 let curYear = "all";
 const selectYear = document.getElementById("yearSelect");
 
-const yearChoices = [
-    {label: "ทั้งหมด", value: "all"},
-    {label: "2566", value: 2566},
-    {label: "2567", value: 2567},
-    {label: "2568", value: 2568},
-];
-
-yearChoices.forEach((obj) => {
-    const choice = document.createElement("option");
-    choice.innerText = obj.label;
-    choice.value = obj.value;
-    
-    selectYear.appendChild(choice);
-});
-
 selectYear.addEventListener("change", () => {
     curYear = selectYear.value;
     animalLayers.forEach(obj => {
@@ -117,21 +165,6 @@ selectYear.addEventListener("change", () => {
 // Season Selector
 let curSeason = "all"; //Default Value
 const selectSeason = document.getElementById("seasonSelect");
-
-const seasonChoices = [
-    {label: "ทั้งหมด", value: "all"},
-    {label: "ฤดูร้อน", value: "summer"},
-    {label: "ฤดูฝน", value: "rainy"},
-    {label: "ฤดูหนาว", value: "winter"},
-];
-
-seasonChoices.forEach((obj) => {
-    const choice = document.createElement("option");
-    choice.innerText = obj.label;
-    choice.value = obj.value;
-    
-    selectSeason.appendChild(choice);
-});
 
 selectSeason.addEventListener("change", () => {
     curSeason = selectSeason.value;
@@ -149,20 +182,6 @@ let curClassify = "year";
 const selectClassify = document.getElementById("classify");
 document.querySelector(".yearSelect").style.display = "block";
 document.querySelector(".seasonSelect").style.display = "none";
-
-const classifyChoices = [
-    // {label: "รายเดือน", value: "month"},
-    {label: "รายปี", value: "year"},
-    {label: "รายฤดู", value: "season"},
-];
-
-classifyChoices.forEach((obj) => {
-    const choice = document.createElement("option");
-    choice.innerText = obj.label;
-    choice.value = obj.value;
-    
-    selectClassify.appendChild(choice);
-});
 
 selectClassify.addEventListener("change", ()=>{
     selectMonth.value = "all";
@@ -236,8 +255,8 @@ setLang("th");
 const selectLang = document.getElementById("langSelect");
 
 const langChoices = [
-    {label: "ไทย (th)", value: "th"},
-    {label: "English (en)", value: "en"},
+    {label: "ไทย (TH)", value: "th"},
+    {label: "English (EN)", value: "en"},
 ];
 
 langChoices.forEach((obj) => {
