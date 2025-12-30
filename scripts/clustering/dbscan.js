@@ -33,7 +33,7 @@ function haversine(a, b) {
     return 2 * R * Math.asin(Math.sqrt(h));
 }
 
-function dbscan(points, eps = 300, minPts = 5) {
+function dbscan(points, eps = 100, minPts = 5) {
     const labels = Array(points.length).fill(undefined);
     let clusterId = 0;
 
@@ -70,4 +70,19 @@ function dbscan(points, eps = 300, minPts = 5) {
     }
 
     return { labels, clusters: clusterId };
+}
+
+function computeClusterRadii(points, labels, centroids) {
+    const radii = Array(centroids.length).fill(0);
+
+    points.forEach((p, i) => {
+        const c = labels[i];
+        if (c === -1) return;
+
+        const idx = c - 1;
+        const d = haversine(centroids[idx], p);
+        radii[idx] = Math.max(radii[idx], d);
+    });
+
+    return radii;
 }
