@@ -49,7 +49,7 @@
 <body>
     <div id="controls">
         <div class="animalSelect">
-            <label for="animalSelect">เลือกสัตว์:</label>
+            <label for="animalSelect">สัตว์:</label>
             <select id="animalSelect">
                 <option value="all">ทั้งหมด</option>
             </select>
@@ -60,18 +60,18 @@
             <select id="classify"></select>
         </div>
         
-        <div class="monthSelect">
-            <label for="monthSelect">เลือกเดือน:</label>
-            <select id="monthSelect"></select>
-        </div>
-        
         <div class="yearSelect">
-            <label for="yearSelect">เลือกปี:</label>
+            <label for="yearSelect">ปี:</label>
             <select id="yearSelect"></select>
         </div>
         
+        <div class="monthSelect">
+            <label for="monthSelect">เดือน:</label>
+            <select id="monthSelect"></select>
+        </div>
+        
         <div class="seasonSelect">
-            <label for="seasonSelect">เลือกฤดู:</label>
+            <label for="seasonSelect">ฤดู:</label>
             <select id="seasonSelect"></select>
         </div>
         
@@ -179,10 +179,14 @@
         const minPts = document.getElementById("minPts").value || 3;
         const { labels, clusters } = dbscan(coordinates, eps, minPts);
 
+        const centroids = computeCentroids(coordinates, labels, clusters);
+        const radii = computeClusterRadii(coordinates, labels, centroids);
+
         return {
             k: clusters,
             labels,
-            centroids: computeCentroids(coordinates, labels, clusters)
+            centroids,
+            radii,
         };
     }
     </script>

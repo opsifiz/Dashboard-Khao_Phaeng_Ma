@@ -150,13 +150,13 @@ selectSeason.addEventListener("change", () => {
 });
 
 //Classify Selector
-let curClassify = "month";
+let curClassify = "year";
 const selectClassify = document.getElementById("classify");
-document.querySelector(".yearSelect").style.display = "none";
+document.querySelector(".yearSelect").style.display = "block";
 document.querySelector(".seasonSelect").style.display = "none";
 
 const classifyChoices = [
-    {label: "รายเดือน", value: "month"},
+    // {label: "รายเดือน", value: "month"},
     {label: "รายปี", value: "year"},
     {label: "รายฤดู", value: "season"},
 ];
@@ -231,8 +231,8 @@ selectClassify.addEventListener("change", ()=>{
         <span style="color:#0000FF">■</span> ฤดูหนาว<br>
         `;
     }
-    document.querySelector(".monthSelect").style.display = (curClassify==="month"?"block":"none");
-    document.querySelector(".yearSelect").style.display = (curClassify==="year"?"block":"none");
+    document.querySelector(".monthSelect").style.display = (curClassify==="year"?"block":"none");
+    // document.querySelector(".yearSelect").style.display = (curClassify==="year"?"block":"none");
     document.querySelector(".seasonSelect").style.display = (curClassify==="season"?"block":"none");
 });
 

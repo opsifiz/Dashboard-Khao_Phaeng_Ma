@@ -48,7 +48,7 @@
 <body>
     <div id="controls">
         <div class="animalSelect">
-            <label for="animalSelect">เลือกสัตว์:</label>
+            <label for="animalSelect">สัตว์:</label>
             <select id="animalSelect">
                 <option value="all">ทั้งหมด</option>
             </select>
@@ -59,18 +59,18 @@
             <select id="classify"></select>
         </div>
         
-        <div class="monthSelect">
-            <label for="monthSelect">เลือกเดือน:</label>
-            <select id="monthSelect"></select>
-        </div>
-        
         <div class="yearSelect">
-            <label for="yearSelect">เลือกปี:</label>
+            <label for="yearSelect">ปี:</label>
             <select id="yearSelect"></select>
         </div>
         
+        <div class="monthSelect">
+            <label for="monthSelect">เดือน:</label>
+            <select id="monthSelect"></select>
+        </div>
+        
         <div class="seasonSelect">
-            <label for="seasonSelect">เลือกฤดู:</label>
+            <label for="seasonSelect">ฤดู:</label>
             <select id="seasonSelect"></select>
         </div>
 
@@ -242,8 +242,6 @@
               animalLayers.forEach(obj => {
                   if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
                       if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-                      xSum += obj.X;
-                      ySum += obj.Y;
                   } else {
                       if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
                   }
