@@ -48,35 +48,38 @@
 <body>
     <div id="controls">
         <div class="animalSelect">
-            <label for="animalSelect">สัตว์:</label>
-            <select id="animalSelect">
-                <option value="all">ทั้งหมด</option>
-            </select>
+            <label id="" for="animalSelect">สัตว์:</label>
+            <select id="animalSelect"></select>
         </div>
 
         <div class="classifySelect">
-            <label for="classify">จำแนก</label>
+            <label id="" for="classify">จำแนก</label>
             <select id="classify"></select>
         </div>
         
         <div class="yearSelect">
-            <label for="yearSelect">ปี:</label>
+            <label id="" for="yearSelect">ปี:</label>
             <select id="yearSelect"></select>
         </div>
         
         <div class="monthSelect">
-            <label for="monthSelect">เดือน:</label>
+            <label id="monthLabel" for="monthSelect"></label>
             <select id="monthSelect"></select>
         </div>
         
         <div class="seasonSelect">
-            <label for="seasonSelect">ฤดู:</label>
+            <label id="" for="seasonSelect">ฤดู:</label>
             <select id="seasonSelect"></select>
         </div>
 
         <div class="mapSelect">
-            <label for="mapSelect">ประเภทแผนที่:</label>
+            <label id="" for="mapSelect">ประเภทแผนที่:</label>
             <select id="mapSelect"></select>
+        </div>
+
+        <div class="langSelect">
+            <label for="langSelect">ภาษา:</label>
+            <select id="langSelect"></select>
         </div>
     </div>
     <div id="map"></div>
@@ -118,7 +121,7 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
-    <script src="scripts/selectors.js"></script>
+    <script type="module" src="scripts/selectors.js"></script>
     <script>
           const rect1 = document.getElementById("rect1");
           const toggleBtn1 = document.getElementById("toggle-btn1");
@@ -144,8 +147,6 @@
 
           const map = L.map('map').setView(KHAO_PHAENG_MA, 12);
 
-          maps.osm.addTo(map);
-
           const redIcon = L.icon({
               iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
               shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
@@ -162,6 +163,8 @@
 
           let animalLayers = [];
           let animals = new Set();
+
+        animals.add("ทั้งหมด");
 
         fetch("./border/khao_phaeng_ma.geojson")
         .then(res => {

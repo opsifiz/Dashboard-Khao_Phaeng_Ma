@@ -50,9 +50,7 @@
     <div id="controls">
         <div class="animalSelect">
             <label for="animalSelect">สัตว์:</label>
-            <select id="animalSelect">
-                <option value="all">ทั้งหมด</option>
-            </select>
+            <select id="animalSelect"></select>
         </div>
 
         <div class="classifySelect">
@@ -66,7 +64,7 @@
         </div>
         
         <div class="monthSelect">
-            <label for="monthSelect">เดือน:</label>
+            <label id="monthLabel" for="monthSelect"></label>
             <select id="monthSelect"></select>
         </div>
         
@@ -97,6 +95,11 @@
             <button id="borderLineModalBtn">
                 <label for="borderLineModal">ตั้งค่าเส้นเขตแดน</label>
             </button>
+        </div>
+
+        <div class="langSelect">
+            <label for="langSelect">ภาษา:</label>
+            <select id="langSelect"></select>
         </div>
     </div>
     <div id="map"></div>
@@ -193,8 +196,7 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
-    <script src="scripts/selectors.js"></script>
-
+    <script type="module" src="scripts/selectors.js"></script>
     <script>
         const rect1 = document.getElementById("rect1");
         const toggleBtn1 = document.getElementById("toggle-btn1");
@@ -226,10 +228,6 @@
 
         const map = L.map('map').setView(KHAO_PHAENG_MA, 12);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
         const redIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
             shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
@@ -246,6 +244,8 @@
 
         let animalLayers = [];
         let animals = new Set();
+
+        animals.add("ทั้งหมด");
 
         fetch("./data/animals_data.json")
         .then(response => response.json())

@@ -49,9 +49,7 @@
     <div id="controls">
         <div class="animalSelect">
             <label for="animalSelect">สัตว์:</label>
-            <select id="animalSelect">
-                <option value="all">ทั้งหมด</option>
-            </select>
+            <select id="animalSelect"></select>
         </div>
 
         <div class="classifySelect">
@@ -65,7 +63,7 @@
         </div>
         
         <div class="monthSelect">
-            <label for="monthSelect">เดือน:</label>
+            <label id="monthLabel" for="monthSelect"></label>
             <select id="monthSelect"></select>
         </div>
 
@@ -82,6 +80,11 @@
         <div class="clustering">
             <label for="clustering">จัดกลุ่ม:</label>
             <button id="runBtn">ทำงาน</button>
+        </div>
+
+        <div class="langSelect">
+            <label for="langSelect">ภาษา:</label>
+            <select id="langSelect"></select>
         </div>
     </div>
     <div id="map"></div>
@@ -124,19 +127,15 @@
     <script src="clustering.js"></script>
     <script>
     function runClustering(coordinates) {
-
         const k = findBestK(coordinates);
         const result = kmeans(coordinates, k, 20);
-        // console.log("k =", k);
-        // console.log("labels =", result.labels);
-        // console.log("centroids =", result.centroids);
         return {k, labels: result.labels, centroids: result.centroids};
     }
     </script>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
-    <script src="scripts/selectors.js"></script>
+    <script type="module" src="scripts/selectors.js"></script>
     <script>
         const rect1 = document.getElementById("rect1");
         const toggleBtn1 = document.getElementById("toggle-btn1");
@@ -168,10 +167,6 @@
 
         const map = L.map('map').setView(KHAO_PHAENG_MA, 12);
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
         const redIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
             shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
@@ -189,23 +184,7 @@
         let animalLayers = [];
         let animals = new Set();
 
-        fetch("./border/khao_phaeng_ma.geojson")
-        .then(res => {
-            if (!res.ok) throw new Error("Failed to load GeoJSON");
-            return res.json();
-        })
-        .then(geojsonData => {
-            const borderPolygon = L.geoJSON(geojsonData, {
-                style: {
-                    color: "#FF0000",
-                    weight: 2,
-                    fillOpacity: 0
-                }
-            }).addTo(map);
-
-            map.fitBounds(borderPolygon.getBounds());
-        })
-        .catch(err => console.error(err));
+        animals.add("ทั้งหมด");
 
         fetch("./data/animals_data.json")
         .then(response => response.json())
