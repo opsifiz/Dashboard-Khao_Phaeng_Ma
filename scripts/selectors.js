@@ -1,3 +1,5 @@
+import { getLang, setLang } from "./language.js";
+
 const name2hex = {
     "ช้างป่า":  "#FF0000",
     "กระทิง":  "#0000FF",
@@ -46,36 +48,29 @@ const maps = {
     sat: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'),
 };
 
+function renderLang(){
+    const lang = getLang();
+
+    // Month Selector
+    document.getElementById("monthLabel").innerHTML = lang.monthLabels;
+    let monthChoices = lang.months;
+    selectMonth.innerHTML = "";
+    
+    monthChoices.forEach((obj) => {
+        const choice = document.createElement("option");
+        choice.innerText = obj.label;
+        choice.value = obj.value;
+        
+        selectMonth.appendChild(choice);
+    });
+}
+
 // Animal Selector
 let curAnimal = "all";
 
 // Month Selector
 let curMonth = "all";
 const selectMonth = document.getElementById("monthSelect");
-
-const monthChoices = [
-    {label: "ทั้งหมด", value: "all"},
-    {label: "ม.ค.", value: "1"},
-    {label: "ก.พ.", value: "2"},
-    {label: "มี.ค.", value: "3"},
-    {label: "เม.ษ.", value: "4"},
-    {label: "พ.ค.", value: "5"},
-    {label: "มิ.ย.", value: "6"},
-    {label: "ก.ค.", value: "7"},
-    {label: "ส.ค.", value: "8"},
-    {label: "ก.ย.", value: "9"},
-    {label: "ต.ค", value: "10"},
-    {label: "พ.ย.", value: "11"},
-    {label: "ธ.ค.", value: "12"},
-];
-
-monthChoices.forEach((obj) => {
-    const choice = document.createElement("option");
-    choice.innerText = obj.label;
-    choice.value = obj.value;
-    
-    selectMonth.appendChild(choice);
-});
 
 selectMonth.addEventListener("change", () => {
     curMonth = selectMonth.value;
@@ -235,6 +230,30 @@ selectClassify.addEventListener("change", ()=>{
     // document.querySelector(".yearSelect").style.display = (curClassify==="year"?"block":"none");
     document.querySelector(".seasonSelect").style.display = (curClassify==="season"?"block":"none");
 });
+
+// Language Selector
+setLang("th");
+const selectLang = document.getElementById("langSelect");
+
+const langChoices = [
+    {label: "ไทย (th)", value: "th"},
+    {label: "English (en)", value: "en"},
+];
+
+langChoices.forEach((obj) => {
+    const choice = document.createElement("option");
+    choice.innerText = obj.label;
+    choice.value = obj.value;
+    
+    selectLang.appendChild(choice);
+});
+
+selectLang.addEventListener("change", () => {
+    setLang(selectLang.value);
+    renderLang();
+});
+
+renderLang();
 
 // Map Selector
 let curMap = maps.osm; //Default Value
