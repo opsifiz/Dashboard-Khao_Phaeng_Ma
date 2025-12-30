@@ -198,6 +198,26 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
     <script type="module" src="scripts/selectors.js"></script>
     <script>
+        const name2hex = {
+            "ช้างป่า":  "#FF0000",
+            "กระทิง":  "#0000FF",
+            "ลิงกัง":   "#00FF00",
+            "เลียงผา": "#FF7F00",
+            "กวาง":   "#4B0082",
+            "หมีควาย": "#8B00FF",
+            "1":  "#800000",
+            "2":  "#FF0000",
+            "3":  "#FF7F00",
+            "4":  "#FFC0CB",
+            "5":  "#FFFF00",
+            "6":  "#00FF00",
+            "7":  "#0000FF",
+            "8":  "#8B00FF",
+            "9":  "#4B0082",
+            "10": "#A9A9A9",
+            "11": "#4c4c4c",
+            "12": "#000000"
+        }
         const rect1 = document.getElementById("rect1");
         const toggleBtn1 = document.getElementById("toggle-btn1");
         const dataInfo = document.getElementById('data');
@@ -227,6 +247,10 @@
         const KHAO_PHAENG_MA = [14.375, 101.79];
 
         const map = L.map('map').setView(KHAO_PHAENG_MA, 12);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
         const redIcon = L.icon({
             iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
