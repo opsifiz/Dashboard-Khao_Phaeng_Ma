@@ -85,6 +85,14 @@
             <button id="runBtn">ทำงาน</button>
         </div>
 
+        <div class="inputs">
+            <label for="eps">EPS : </label>
+            <input type="number" name="" id="eps">
+
+            <label for="minPts">Min Points : </label>
+            <input type="number" name="" id="minPts">
+        </div>
+
         <div class="borderModal">
             <button id="borderLineModalBtn">
                 <label for="borderLineModal">ตั้งค่าเส้นเขตแดน</label>
@@ -92,7 +100,7 @@
         </div>
     </div>
     <div id="map"></div>
-    <div class="floating-rect modal1" id="rect1" style="top: 20px; right: 20px;">
+    <div class="floating-rect modal1" id="rect1" style="top: 10%; right: 20px;">
         <span id="toggle-btn1" class="close-btn">–</span>
         <b>ข้อมูลสัตว์</b>
         <br>
@@ -167,7 +175,9 @@
     <script src="scripts/clustering/dbscan.js"></script>
     <script>
     function runClustering(coordinates) {
-        const { labels, clusters } = dbscan(coordinates, 250, 3);
+        const eps = document.getElementById("eps").value || 250;
+        const minPts = document.getElementById("minPts").value || 3;
+        const { labels, clusters } = dbscan(coordinates, eps, minPts);
 
         return {
             k: clusters,
@@ -252,13 +262,6 @@
 
                 animals.add(row.Type);
 
-                let shape = L.circleMarker([lat, lon], {
-                    color: name2hex[month],
-                    fillColor: name2hex[month],
-                    fillOpacity: 0.3,
-                    radius: 5
-                }).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
-
                 const curIcon = L.icon({
                     iconUrl: `assets/${row.Type}_${name2hex[month].slice(1)}.png`,
                     iconSize: [10, 10],
@@ -266,7 +269,7 @@
                     popupAnchor: [10, 10]
                 });
 
-                shape = L.marker([lat, lon], {icon: curIcon}
+                let shape = L.marker([lat, lon], {icon: curIcon}
                 ).bindPopup(`<b>${row.Type}</b><br>จำนวน: ${row.Quantity}`);
 
                 animalLayers.push({type: row.Type, layer: shape, month: month, year: year, lat: lat, lon: lon});
@@ -325,12 +328,16 @@
                 
                 console.log(clusteringResult);
 
+                animalLayers.forEach((obj, idx) => {
+                    if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
+                });
+
                 clusteringResult.labels.forEach((label, i) => {
-                    if(label === -1){
-                        hex = "#000000";
-                    }else{
-                        hex = name2hex[String(label+1)];
-                    }
+                    if(label === -1) return;
+                    hex = name2hex[String(label+1)];
+
+                    if(!hex) return;
+
                     const objIndex = mappingIndex[i];
                     const obj = animalLayers[objIndex];
 
@@ -340,6 +347,7 @@
                             iconSize: [10, 10]
                         });
                         obj.layer.setIcon(newIcon);
+                        obj.layer.addTo(map);
                     }
                 });
             });
