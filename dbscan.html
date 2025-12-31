@@ -92,8 +92,8 @@
         </div>
 
         <div class="borderModal">
-            <button id="borderLineModalBtn">
-                <label for="borderLineModal">ตั้งค่าเส้นเขตแดน</label>
+            <button id="boundaryModalBtn">
+                <label id="boundaryModalLabel" for="boundaryModal">ตั้งค่าเส้นขอบแดน</label>
             </button>
         </div>
 
@@ -138,7 +138,7 @@
             <span style="color:#000000">■</span> ธันวาคม<br>
         </div>
     </div>
-    <div id="borderLineModal" class="modal">
+    <div id="boundaryModal" class="modal">
         <!-- Modal content -->
         <div class="modal-content">
             <span class="close" id="close-tutorial">&times;</span>
@@ -155,24 +155,6 @@
         </div>
     </div>
     <script type="module" src="scripts/boundaryController.js"></script>
-
-    <script>
-        var modal1 = document.getElementById("borderLineModal");
-        var btn1 = document.getElementById("borderLineModalBtn");
-        var span1 = document.getElementsByClassName("close")[0];
-        btn1.onclick = function() {
-            modal1.style.display = "block";
-        }
-        span1.onclick = function() {
-            modal1.style.display = "none";
-        }
-
-        window.onclick = function(event) {
-            if (event.target == modal1) {
-                modal1.style.display = "none";
-            }
-        }
-    </script>
 
     <script src="clustering.js"></script>
     <script src="scripts/clustering/dbscan.js"></script>

@@ -227,3 +227,19 @@ function renderBorders(){
         }
     });
 }
+
+const boundaryModal = document.getElementById("boundaryModal");
+const boundaryModalBtn = document.getElementById("boundaryModalBtn");
+const closeBtn = document.querySelector(".close");
+boundaryModalBtn.onclick = function() {
+    boundaryModal.style.display = "block";
+}
+closeBtn.onclick = function() {
+    boundaryModal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == boundaryModal) {
+        boundaryModal.style.display = "none";
+    }
+}
