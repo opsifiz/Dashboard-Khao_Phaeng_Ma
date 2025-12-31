@@ -125,6 +125,9 @@ function renderLang(){
 
     // Lang Selector
     document.getElementById("langLabel").innerHTML = lang.langLabel;
+
+    // Boundary Modal
+    document.getElementById("boundaryModalLabel").innerHTML = lang.boundaryModalLabel;
 }
 
 // Animal Selector

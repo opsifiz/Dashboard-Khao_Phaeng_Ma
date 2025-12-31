@@ -52,6 +52,7 @@ export const languages = {
         clusteringLabel: "จัดกลุ่ม:",
         runClustering: "ทำงาน",
         langLabel: "ภาษา:",
+        boundaryModalLabel: "ตั้งค่าเส้นขอบแดน",
     },
     "en":{
         animalLabel: "Wild Animal:",
@@ -104,6 +105,7 @@ export const languages = {
         clusteringLabel: "Cluster:",
         runClustering: "Run",
         langLabel: "Langauge:",
+        boundaryModalLabel: "Boundary Setting",
     }
 }
 
