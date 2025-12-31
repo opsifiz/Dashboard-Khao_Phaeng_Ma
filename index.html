@@ -44,6 +44,7 @@
             float: right;
         }
     </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div id="controls">
@@ -80,6 +81,12 @@
         <div class="clustering">
             <label id="clusteringLabel" for="clustering"></label>
             <button id="runClustering">ทำงาน</button>
+        </div>
+        
+        <div class="borderModal">
+            <button id="boundaryModalBtn">
+                <label id="boundaryModalLabel" for="boundaryModal"></label>
+            </button>
         </div>
 
         <div class="langSelect">
@@ -123,7 +130,23 @@
             <span style="color:#000000">■</span> ธันวาคม<br>
         </div>
     </div>
-
+    <div id="boundaryModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close" id="close-tutorial">&times;</span>
+            <p class="modal-title">ตั้งค่าเส้นเขตแดน</p>
+            <hr>
+            <section class="boundary"></section>
+            <hr style="width: 80%;">
+            <p class="mapOptions">Show Border</p>
+            <input type="checkbox" id="showBorder">
+            <span>show</span>
+            <p class="mapOptions">Border Color</p>
+            <input disabled type="color" value="#ff0000" id="borderColor">
+            <br>
+        </div>
+    </div>
+    <script type="module" src="scripts/boundaryController.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
     <script type="module" src="scripts/selectors.js"></script>
