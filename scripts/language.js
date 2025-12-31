@@ -14,7 +14,7 @@ export const languages = {
         ],
         classifyLabel: "จำแนก:",
         classifys: [
-            {label: "รายเดือน", value: "month"},
+            // {label: "รายเดือน", value: "month"},
             {label: "รายปี", value: "year"},
             {label: "รายฤดู", value: "season"},
         ],
