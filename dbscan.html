@@ -153,12 +153,21 @@
             <br>
         </div>
     </div>
+    <script>
+        window.appState = {
+            curAnimal: "all",
+            curSeason: "all",
+            curMonth: "all",
+            curYear: "all",
+            curClassify: "year",
+        };
+    </script>
     <script type="module" src="scripts/boundaryController.js"></script>
     <script src="clustering.js"></script>
     <script src="scripts/clustering/dbscan.js"></script>
     <script>
     function runClustering(coordinates) {
-        const eps = document.getElementById("eps").value || 250;
+        const eps = document.getElementById("eps").value || 100;
         const minPts = document.getElementById("minPts").value || 3;
         const { labels, clusters } = dbscan(coordinates, eps, minPts);
 
@@ -278,20 +287,6 @@
                 animalLayers.push({type: row.Type, layer: shape, month: month, year: year, lat: lat, lon: lon});
                 shape.addTo(map);
             });
-
-            const selectAnimal = document.getElementById("animalSelect");
-
-            selectAnimal.addEventListener("change", () => {
-                curAnimal = selectAnimal.value;
-                // console.log(value);
-                animalLayers.forEach(obj => {
-                    if((curAnimal === 'all' || obj.type == curAnimal) && (curSeason === 'all' || month2season[obj.month] == curSeason)){
-                        if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
-                    } else {
-                        if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
-                    }
-                });
-            });
             
             function filtering(res, curAnimal, curSeason){
                 res = res.filter(row => row.Type === curAnimal && month2season[row.month] === curSeason);
@@ -299,6 +294,13 @@
             }
     
             document.getElementById("runClustering").addEventListener("click", async ()=>{
+                const state = window.appState;
+
+                const curAnimal = state.curAnimal;
+                const curMonth = state.curMonth;
+                const curYear = state.curYear;
+                const curSeason = state.curSeason;
+
                 if(curAnimal !== "ช้างป่า" && curAnimal !== "กระทิง"){
                     console.error("Unavailable Animal!");
                     return;
@@ -309,9 +311,28 @@
     
                 let points = [];
                 let mappingIndex = [];
+
+                const month2season = [
+                    "-",
+                    "winter",
+                    "winter",
+                    "summer",
+                    "summer",
+                    "summer",
+                    "summer",
+                    "rainy",
+                    "rainy",
+                    "rainy",
+                    "rainy",
+                    "winter",
+                    "winter",
+                ];
                 
                 animalLayers.forEach((obj, idx) => {
-                    if((curAnimal === 'all' || obj.type == curAnimal) && (curSeason === 'all' || month2season[obj.month] == curSeason)){
+                    if(
+                        (curAnimal === 'all' || obj.type == curAnimal) && 
+                        (curSeason === 'all' || month2season[obj.month] == curSeason)
+                    ){
                         if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
                         points.push([obj.lon, obj.lat]);
                         mappingIndex.push(idx);

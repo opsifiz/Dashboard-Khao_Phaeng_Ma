@@ -1,5 +1,7 @@
 import { getLang, setLang } from "./language.js";
 
+const state = window.appState;
+
 const name2hex = {
     "ช้างป่า":  "#FF0000",
     "กระทิง":  "#0000FF",
@@ -131,18 +133,37 @@ function renderLang(){
 }
 
 // Animal Selector
-let curAnimal = "all";
 const selectAnimal = document.getElementById("animalSelect");
 
+selectAnimal.addEventListener("change", () => {
+    state.curAnimal = selectAnimal.value;
+    // console.log(value);
+    animalLayers.forEach(obj => {
+        if(
+            (state.curAnimal === 'all' || obj.type == state.curAnimal) && 
+            (state.curMonth === 'all' || obj.month == state.curMonth) &&
+            (state.curYear === "all" || obj.year == state.curYear) &&
+            (state.curYear === 'all' || month2season[obj.month] == curSeason)
+        ){
+            if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
+        } else {
+            if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
+        }
+    });
+});
+
 // Month Selector
-let curMonth = "all";
 const selectMonth = document.getElementById("monthSelect");
 
 selectMonth.addEventListener("change", () => {
-    curMonth = selectMonth.value;
+    state.curMonth = selectMonth.value;
     // console.log(curMonth);
     animalLayers.forEach(obj => {
-        if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
+        if(
+            (state.curAnimal === 'all' || obj.type == state.curAnimal) && 
+            (state.curMonth === 'all' || obj.month == state.curMonth) && 
+            (state.curYear === 'all' || obj.year == state.curYear)
+        ){
             if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
         } else {
             if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
@@ -151,13 +172,17 @@ selectMonth.addEventListener("change", () => {
 });
 
 // Year Selector
-let curYear = "all";
 const selectYear = document.getElementById("yearSelect");
 
 selectYear.addEventListener("change", () => {
-    curYear = selectYear.value;
+    state.curYear = selectYear.value;
+
     animalLayers.forEach(obj => {
-        if((curAnimal === 'all' || obj.type == curAnimal) && (curMonth === 'all' || obj.month == curMonth) && (obj.year == curYear || curYear === "all")){
+        if(
+            (state.curAnimal === 'all' || obj.type == state.curAnimal) && 
+            (state.curMonth === 'all' || obj.month == state.curMonth) && 
+            (state.curYear === "all" || obj.year == state.curYear)
+        ){
             if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
         } else {
             if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
@@ -166,13 +191,15 @@ selectYear.addEventListener("change", () => {
 });
 
 // Season Selector
-let curSeason = "all"; //Default Value
 const selectSeason = document.getElementById("seasonSelect");
 
 selectSeason.addEventListener("change", () => {
-    curSeason = selectSeason.value;
+    state.curSeason = selectSeason.value;
     animalLayers.forEach(obj => {
-        if((curAnimal === 'all' || obj.type == curAnimal) && (curSeason === 'all' || month2season[obj.month] == curSeason)){
+        if(
+            (state.curAnimal === 'all' || obj.type == state.curAnimal) && 
+            (state.curSeason === 'all' || month2season[obj.month] == state.curSeason)
+        ){
             if(!map.hasLayer(obj.layer)) obj.layer.addTo(map);
         } else {
             if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
@@ -181,12 +208,13 @@ selectSeason.addEventListener("change", () => {
 });
 
 //Classify Selector
-let curClassify = "year";
 const selectClassify = document.getElementById("classify");
+
 document.querySelector(".yearSelect").style.display = "block";
 document.querySelector(".seasonSelect").style.display = "none";
 
 selectClassify.addEventListener("change", ()=>{
+    state.curClassify = "year";
     selectMonth.value = "all";
     selectYear.value = "all";
     selectSeason.value = "all";
@@ -194,7 +222,8 @@ selectClassify.addEventListener("change", ()=>{
     selectYear.dispatchEvent(new Event("change"));
     selectSeason.dispatchEvent(new Event("change"));
 
-    curClassify = selectClassify.value;
+    state.curClassify = selectClassify.value;
+    let curClassify = state.curClassify;
 
     animalLayers.forEach(obj => {
         let iconUrl = "-";
