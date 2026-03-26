@@ -151,6 +151,11 @@
             <p class="mapOptions">Border Color</p>
             <input disabled type="color" value="#ff0000" id="borderColor">
             <br>
+            <input type="checkbox" id="showLoggingLayer">
+            <span>แสดงจุดตัดไม้</span>
+            <input type="checkbox" id="showRiskLayer">
+            <span>แสดงจุดเสี่ยง</span>
+            <br>
         </div>
     </div>
     <script>
@@ -187,6 +192,56 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
     <script type="module" src="scripts/selectors.js"></script>
     <script>
+        // จุดตัดไม้ (สีแดง)
+        fetch("./data/จุดตัดไม้.geojson")
+        .then(res => res.json())
+        .then(data => {
+            loggingLayer = L.geoJSON(data, {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 6,
+                        fillColor: "#FF0000",
+                        color: "#FF0000",
+                        weight: 1,
+                        fillOpacity: 0.8
+                    });
+                }
+            });
+        });
+
+        // จุดเสี่ยง (สีเหลือง)
+        fetch("./data/จุดเสี่ยง.geojson")
+        .then(res => res.json())
+        .then(data => {
+            riskLayer = L.geoJSON(data, {
+                pointToLayer: function (feature, latlng) {
+                    return L.circleMarker(latlng, {
+                        radius: 6,
+                        fillColor: "#FFFF00",
+                        color: "#FFFF00",
+                        weight: 1,
+                        fillOpacity: 0.8
+                    });
+                }
+            });
+        });
+
+        document.getElementById("showLoggingLayer").addEventListener("change", function() {
+            if(this.checked){
+                if(loggingLayer) loggingLayer.addTo(map);
+            } else {
+                if(loggingLayer) map.removeLayer(loggingLayer);
+            }
+        });
+
+        document.getElementById("showRiskLayer").addEventListener("change", function() {
+            if(this.checked){
+                if(riskLayer) riskLayer.addTo(map);
+            } else {
+                if(riskLayer) map.removeLayer(riskLayer);
+            }
+        });
+
         const name2hex = {
             "ช้างป่า":  "#FF0000",
             "กระทิง":  "#0000FF",
