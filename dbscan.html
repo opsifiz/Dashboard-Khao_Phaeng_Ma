@@ -151,10 +151,15 @@
             <p class="mapOptions">Border Color</p>
             <input disabled type="color" value="#ff0000" id="borderColor">
             <br>
+
             <input type="checkbox" id="showLoggingLayer">
             <span>แสดงจุดตัดไม้</span>
+
             <input type="checkbox" id="showRiskLayer">
             <span>แสดงจุดเสี่ยง</span>
+            
+            <input type="checkbox" id="showThailandBoundaryLayer">
+            <span>แสดงขอบเขตประเทศไทย</span>
             <br>
         </div>
     </div>
@@ -226,6 +231,19 @@
             });
         });
 
+        // ขอบเขตประเทศไทย
+        fetch("./data/thailand_boundary.geojson")
+        .then(res => res.json())
+        .then(geojson => {
+            thailandBoundarylayer = L.geoJSON(geojson, {
+                    style: {
+                        color: "#ff0000",
+                        weight: 2,
+                        fillOpacity: 0,
+                    }
+            });
+        });
+
         document.getElementById("showLoggingLayer").addEventListener("change", function() {
             if(this.checked){
                 if(loggingLayer) loggingLayer.addTo(map);
@@ -239,6 +257,14 @@
                 if(riskLayer) riskLayer.addTo(map);
             } else {
                 if(riskLayer) map.removeLayer(riskLayer);
+            }
+        });
+
+        document.getElementById("showThailandBoundaryLayer").addEventListener("change", function() {
+            if(this.checked){
+                if(thailandBoundarylayer) thailandBoundarylayer.addTo(map);
+            } else {
+                if(thailandBoundarylayer) map.removeLayer(thailandBoundarylayer);
             }
         });
 
