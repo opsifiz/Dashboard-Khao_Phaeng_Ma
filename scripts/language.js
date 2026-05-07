@@ -40,6 +40,7 @@ export const languages = {
             {label: "2566", value: 2566},
             {label: "2567", value: 2567},
             {label: "2568", value: 2568},
+            {label: "2569", value: 2569},
         ],
         seasonLabel: "ฤดู:",
         seasons: [
@@ -93,6 +94,7 @@ export const languages = {
             {label: "2023", value: 2566},
             {label: "2024", value: 2567},
             {label: "2025", value: 2568},
+            {label: "2026", value: 2569},
         ],
         seasonLabel: "Season:",
         seasons: [
