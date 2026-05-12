@@ -203,15 +203,16 @@
           fetch("./data/animals_data.json")
           .then(response => response.json())
           .then(res => {
-              const zoneNumber = 47;
-              const hemisphere = 'N';
-              const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
-              let ind = 0;
-              res.forEach(row => {
+                const zoneNumber = 47;
+                const hemisphere = 'N';
+                const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
+                let ind = 0;
+                const currentYear = new Date().getFullYear();
+                res.forEach(row => {
                   if(row.X == '-' || row.Y == '-' || row.Type == '-') return;
                   if(row.Type == "ลูกกระทิง") row.Type = "กระทิง";
                   let year = parseInt(row["วัน/เดือน/ปี"].split('-')[0]);
-                  if(year <= 2025) year += 543;
+                  if(year <= currentYear) year += 543;
                   let month = parseInt(row["วัน/เดือน/ปี"].split('-')[1]);
                   // console.log(ind, row["วัน/เดือน/ปี"], month);
                   // ind += 1;
@@ -241,8 +242,6 @@
             });
 
           const selectAnimal = document.getElementById("animalSelect");
-          const selectMonths = document.getElementById("monthSelect");
-          const selectYears = document.getElementById("yearSelect");
 
           let curAnimal = "all";
 

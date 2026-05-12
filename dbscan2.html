@@ -398,11 +398,12 @@
             const hemisphere = 'N';
             const utmProj = `+proj=utm +zone=${zoneNumber} +datum=WGS84 ${hemisphere === 'S' ? '+south' : ''}`;
             let ind = 0;
+            const currentYear = new Date().getFullYear();
             res.forEach(row => {
                 if(row.X == '-' || row.Y == '-' || row.Type == '-') return;
                 if(row.Type == "ลูกกระทิง") row.Type = "กระทิง";
                 let year = parseInt(row["วัน/เดือน/ปี"].split('-')[0]);
-                if(year <= 2025) year += 543;
+                if(year <= currentYear) year += 543;
                 let month = parseInt(row["วัน/เดือน/ปี"].split('-')[1]);
                 let x = parseInt(row.X);
                 let y = parseInt(row.Y);

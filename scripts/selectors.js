@@ -233,6 +233,7 @@ selectClassify.addEventListener("change", ()=>{
             if (obj.year === 2566) iconUrl = `assets/${obj.type}_FF0000.png`;
             else if (obj.year === 2567) iconUrl = `assets/${obj.type}_0000FF.png`;
             else if (obj.year === 2568) iconUrl = `assets/${obj.type}_00FF00.png`;
+            else if (obj.year === 2569) iconUrl = `assets/${obj.type}_FFFF00.png`;
         }else if (curClassify === "season") {
             if (month2season[obj.month] === "summer") iconUrl = `assets/${obj.type}_FF0000.png`;
             else if (month2season[obj.month] === "rainy") iconUrl = `assets/${obj.type}_00FF00.png`;
@@ -269,6 +270,7 @@ selectClassify.addEventListener("change", ()=>{
         <span style="color:#FF0000">■</span> 2566<br>
         <span style="color:#0000FF">■</span> 2567<br>
         <span style="color:#00FF00">■</span> 2568<br>
+        <span style="color:#FFFF00">■</span> 2569<br>
         `;
     }else if(curClassify == "season"){
         document.getElementById('moreInfo').innerHTML = `
