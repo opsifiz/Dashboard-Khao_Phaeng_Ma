@@ -82,6 +82,12 @@
             <button id="runClustering"></button>
         </div>
 
+        
+        <div class="loggingClustering">
+            <label id="loggingClusteringLabel" for="runLoggingClustering">จัดกลุ่มจุดตัดไม้ :</label>
+            <button id="runLoggingClustering">Cluster จุดตัดไม้ (DBSCAN)</button>
+        </div>
+
         <div class="inputs">
             <label for="eps">EPS : </label>
             <input type="number" name="" id="eps" style="width: 50px;">
@@ -198,19 +204,22 @@
     <script type="module" src="scripts/selectors.js"></script>
     <script>
         // จุดตัดไม้ (สีแดง)
+        let loggingPoints = [];
+        let loggingLayer = L.layerGroup();
         fetch("./data/จุดตัดไม้.geojson")
         .then(res => res.json())
         .then(data => {
-            loggingLayer = L.geoJSON(data, {
-                pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, {
-                        radius: 6,
-                        fillColor: "#FF0000",
-                        color: "#FF0000",
-                        weight: 1,
-                        fillOpacity: 0.8
-                    });
-                }
+            data.features.forEach(feature => {
+                const [lon, lat] = feature.geometry.coordinates;
+                const marker = L.circleMarker([lat, lon], {
+                    radius: 6,
+                    fillColor: "#FF0000",
+                    color: "#FF0000",
+                    weight: 1,
+                    fillOpacity: 0.8
+                });
+                loggingPoints.push({ lat, lon, marker});
+                loggingLayer.addLayer(marker);
             });
         });
 
@@ -266,6 +275,42 @@
             } else {
                 if(thailandBoundarylayer) map.removeLayer(thailandBoundarylayer);
             }
+        });
+        
+        // สีสำหรับแยกกลุ่ม (cluster) ของจุดตัดไม้ - จุดที่เป็น noise (label -1) จะเป็นสีเทา
+        const loggingClusterColors = [
+            "#e6194b", "#3cb44b", "#4363d8", "#f58231", "#911eb4",
+            "#46f0f0", "#f032e6", "#bcf60c", "#008080", "#9a6324",
+            "#800000", "#000075", "#808000", "#ffd8b1", "#aaffc3"
+        ];
+
+        const NOISE_COLOR = "#808080";
+
+        document.getElementById("runLoggingClustering").addEventListener("click", () => {
+            if (!loggingPoints.length) {
+                console.error("ยังไม่มีข้อมูลจุดตัดไม้ (กำลังโหลดอยู่ หรือไม่มีข้อมูล)");
+                return;
+            }
+
+            const eps = document.getElementById("eps").value || 100;
+            const minPts = document.getElementById("minPts").value || 3;
+            const coordinates = loggingPoints.map(p => [p.lon, p.lat]);
+            const { labels, clusters } = dbscan(coordinates, eps, minPts);
+
+            loggingPoints.forEach((p, i) => {
+                const label = labels[i];
+                const isNoise = label === -1;
+                const color = isNoise ? NOISE_COLOR : loggingClusterColors[label % loggingClusterColors.length];
+                p.marker.setStyle({ fillColor: color, color: color });
+                p.marker.bindPopup(isNoise ? "จุดตัดไม้ (Noise)" : `จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
+            });
+
+            // แสดงเลเยอร์จุดตัดไม้บนแผนที่ พร้อมติ๊กเช็คบ็อกซ์ให้ตรงกัน
+            if (!map.hasLayer(loggingLayer)) loggingLayer.addTo(map);
+            const showLoggingCheckbox = document.getElementById("showLoggingLayer");
+            if (showLoggingCheckbox) showLoggingCheckbox.checked = true;
+
+            console.log(`DBSCAN จุดตัดไม้: พบ ${clusters} กลุ่ม จากทั้งหมด ${loggingPoints.length} จุด (eps=${eps}, minPts=${minPts})`);
         });
 
         const name2hex = {
