@@ -259,6 +259,7 @@
                 if(loggingLayer) loggingLayer.addTo(map);
             } else {
                 if(loggingLayer) map.removeLayer(loggingLayer);
+                if(loggingCentroidLayer) map.removeLayer(loggingCentroidLayer);
             }
         });
 
@@ -314,8 +315,9 @@
                 p.marker.bindPopup(isNoise ? "จุดตัดไม้ (Noise)" : `จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
             });
             
-            // คำนวณ centroid ของแต่ละกลุ่ม แล้ววาดเป็นจุดเครื่องหมาย (รูปดาว/กากบาท) บนแผนที่
+            // คำนวณ centroid และรัศมีของแต่ละกลุ่ม แล้ววาด centroid + วงกลมล้อมรอบกลุ่ม (สีแดง)
             const centroids = computeCentroids(coordinates, labels, clusters);
+            const radii = computeClusterRadii(coordinates, labels, centroids);
             loggingCentroidLayer.clearLayers();
             for (let clusterId = 0; clusterId < clusters; clusterId++) {
                 const lonLat = toLonLat(centroids[clusterId]);
@@ -323,6 +325,20 @@
                 const [lon, lat] = lonLat;
                 const color = loggingClusterColors[clusterId % loggingClusterColors.length];
                 const pointCount = labels.filter(l => l === clusterId).length;
+                const radius = radii[clusterId];
+                
+                // วงกลมสีแดงล้อมรอบกลุ่ม จุดศูนย์กลาง = centroid, รัศมี = radii[clusterId]
+                if (radius && radius > 0) {
+                    const clusterCircle = L.circle([lat, lon], {
+                        radius: radius,
+                        color: "#FF0000",
+                        weight: 2,
+                        fill: false,
+                        dashArray: "6, 4"
+                    }).bindPopup(`<b>ขอบเขตกลุ่มที่ ${clusterId + 1}</b><br>รัศมี: ${radius.toFixed(1)} เมตร`);
+                    loggingCentroidLayer.addLayer(clusterCircle);
+                }
+                
                 const centroidMarker = L.circleMarker([lat, lon], {
                     radius: 10,
                     fillColor: color,
