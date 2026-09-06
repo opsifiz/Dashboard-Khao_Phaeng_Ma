@@ -206,6 +206,7 @@
         // จุดตัดไม้ (สีแดง)
         let loggingPoints = [];
         let loggingLayer = L.layerGroup();
+        let loggingCentroidLayer = L.layerGroup();
         fetch("./data/จุดตัดไม้.geojson")
         .then(res => res.json())
         .then(data => {
@@ -286,14 +287,22 @@
 
         const NOISE_COLOR = "#808080";
 
+        function toLonLat(centroid) {
+            if (!centroid) return null;
+            if (Array.isArray(centroid)) return [centroid[0], centroid[1]];
+            if ("lon" in centroid && "lat" in centroid) return [centroid.lon, centroid.lat];
+            if ("x" in centroid && "y" in centroid) return [centroid.x, centroid.y];
+            return null;
+        }
+
         document.getElementById("runLoggingClustering").addEventListener("click", () => {
             if (!loggingPoints.length) {
                 console.error("ยังไม่มีข้อมูลจุดตัดไม้ (กำลังโหลดอยู่ หรือไม่มีข้อมูล)");
                 return;
             }
 
-            const eps = document.getElementById("eps").value || 100;
-            const minPts = document.getElementById("minPts").value || 3;
+            const eps = document.getElementById("eps").value || 5000;
+            const minPts = document.getElementById("minPts").value || 1;
             const coordinates = loggingPoints.map(p => [p.lon, p.lat]);
             const { labels, clusters } = dbscan(coordinates, eps, minPts);
 
@@ -304,9 +313,35 @@
                 p.marker.setStyle({ fillColor: color, color: color });
                 p.marker.bindPopup(isNoise ? "จุดตัดไม้ (Noise)" : `จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
             });
+            
+            // คำนวณ centroid ของแต่ละกลุ่ม แล้ววาดเป็นจุดเครื่องหมาย (รูปดาว/กากบาท) บนแผนที่
+            const centroids = computeCentroids(coordinates, labels, clusters);
+            loggingCentroidLayer.clearLayers();
+            for (let clusterId = 0; clusterId < clusters; clusterId++) {
+                const lonLat = toLonLat(centroids[clusterId]);
+                if (!lonLat) continue;
+                const [lon, lat] = lonLat;
+                const color = loggingClusterColors[clusterId % loggingClusterColors.length];
+                const pointCount = labels.filter(l => l === clusterId).length;
+                const centroidMarker = L.circleMarker([lat, lon], {
+                    radius: 10,
+                    fillColor: color,
+                    color: "#000000",
+                    weight: 2,
+                    fillOpacity: 1
+                }).bindPopup(`<b>Centroid กลุ่มที่ ${clusterId + 1}</b><br>จำนวนจุด: ${pointCount}`);
+                // กากบาทตรงกลาง ให้ดูออกง่ายว่าเป็น centroid ไม่ใช่จุดข้อมูลปกติ
+                centroidMarker.bindTooltip(`${clusterId + 1}`, {
+                    permanent: true,
+                    direction: "center",
+                    className: "logging-centroid-label"
+                });
+                loggingCentroidLayer.addLayer(centroidMarker);
+            }
 
             // แสดงเลเยอร์จุดตัดไม้บนแผนที่ พร้อมติ๊กเช็คบ็อกซ์ให้ตรงกัน
             if (!map.hasLayer(loggingLayer)) loggingLayer.addTo(map);
+            if (!map.hasLayer(loggingCentroidLayer)) loggingCentroidLayer.addTo(map);
             const showLoggingCheckbox = document.getElementById("showLoggingLayer");
             if (showLoggingCheckbox) showLoggingCheckbox.checked = true;
 
