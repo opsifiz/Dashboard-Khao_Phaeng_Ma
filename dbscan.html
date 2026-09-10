@@ -206,6 +206,7 @@
         // จุดตัดไม้ (สีแดง)
         let loggingPoints = [];
         let loggingLayer = L.layerGroup();
+        let loggingDisplayLayer = L.layerGroup();
         let loggingCentroidLayer = L.layerGroup();
         fetch("./data/จุดตัดไม้.geojson")
         .then(res => res.json())
@@ -219,25 +220,29 @@
                     weight: 1,
                     fillOpacity: 0.8
                 });
-                loggingPoints.push({ lat, lon, marker});
+                loggingPoints.push({ lat, lon, marker, type: "logging"});
                 loggingLayer.addLayer(marker);
+                loggingDisplayLayer.addLayer(marker);
             });
         });
-
+        
         // จุดเสี่ยง (สีเหลือง)
+        let riskDisplayLayer = L.layerGroup();
         fetch("./data/จุดเสี่ยง.geojson")
         .then(res => res.json())
         .then(data => {
-            riskLayer = L.geoJSON(data, {
-                pointToLayer: function (feature, latlng) {
-                    return L.circleMarker(latlng, {
-                        radius: 6,
-                        fillColor: "#FFFF00",
-                        color: "#FFFF00",
-                        weight: 1,
-                        fillOpacity: 0.8
-                    });
-                }
+            data.features.forEach(feature => {
+                const [lon, lat] = feature.geometry.coordinates;
+                const marker = L.circleMarker([lat, lon], {
+                    radius: 6,
+                    fillColor: "#FFFF00",
+                    color: "#FFFF00",
+                    weight: 1,
+                    fillOpacity: 0.8
+                });
+                loggingPoints.push({ lat, lon, marker, type: "risk"});
+                loggingLayer.addLayer(marker);
+                riskDisplayLayer.addLayer(marker);
             });
         });
 
@@ -256,18 +261,19 @@
 
         document.getElementById("showLoggingLayer").addEventListener("change", function() {
             if(this.checked){
-                if(loggingLayer) loggingLayer.addTo(map);
+                if(loggingDisplayLayer) loggingDisplayLayer.addTo(map);
             } else {
-                if(loggingLayer) map.removeLayer(loggingLayer);
+                if(loggingDisplayLayer) map.removeLayer(loggingDisplayLayer);
                 if(loggingCentroidLayer) map.removeLayer(loggingCentroidLayer);
             }
         });
 
         document.getElementById("showRiskLayer").addEventListener("change", function() {
             if(this.checked){
-                if(riskLayer) riskLayer.addTo(map);
+                if(riskDisplayLayer) riskDisplayLayer.addTo(map);
             } else {
-                if(riskLayer) map.removeLayer(riskLayer);
+                if(riskDisplayLayer) map.removeLayer(riskDisplayLayer);
+                if(loggingCentroidLayer) map.removeLayer(loggingCentroidLayer);
             }
         });
 
@@ -302,58 +308,69 @@
                 return;
             }
 
-            const eps = document.getElementById("eps").value || 5000;
-            const minPts = document.getElementById("minPts").value || 1;
+            const eps = document.getElementById("eps").value || 1000;
+            const minPts = document.getElementById("minPts").value || 3;
             const coordinates = loggingPoints.map(p => [p.lon, p.lat]);
             const { labels, clusters } = dbscan(coordinates, eps, minPts);
 
             loggingPoints.forEach((p, i) => {
                 const label = labels[i];
                 const isNoise = label === -1;
-                const color = isNoise ? NOISE_COLOR : loggingClusterColors[label % loggingClusterColors.length];
+
+                if(isNoise){
+                    // ซ่อนจุด noise ออกจากแผนที่
+                    if(loggingLayer.hasLayer(p.marker)) loggingLayer.removeLayer(p.marker);
+                    if(map.hasLayer(p.marker)) map.removeLayer(p.marker);
+                    return;
+                } else {
+                    // ถ้าเคยถูกซ่อนไว้ (จากการรันครั้งก่อน) ให้เพิ่มกลับเข้าเลเยอร์
+                    if(!loggingLayer.hasLayer(p.marker)) loggingLayer.addLayer(p.marker);
+                }
+
+                const color = loggingClusterColors[label % loggingClusterColors.length];
                 p.marker.setStyle({ fillColor: color, color: color });
-                p.marker.bindPopup(isNoise ? "จุดตัดไม้ (Noise)" : `จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
+                p.marker.bindPopup(`จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
             });
             
             // คำนวณ centroid และรัศมีของแต่ละกลุ่ม แล้ววาด centroid + วงกลมล้อมรอบกลุ่ม (สีแดง)
             const centroids = computeCentroids(coordinates, labels, clusters);
             const radii = computeClusterRadii(coordinates, labels, centroids);
             loggingCentroidLayer.clearLayers();
-            for (let clusterId = 0; clusterId < clusters; clusterId++) {
-                const lonLat = toLonLat(centroids[clusterId]);
-                if (!lonLat) continue;
-                const [lon, lat] = lonLat;
-                const color = loggingClusterColors[clusterId % loggingClusterColors.length];
-                const pointCount = labels.filter(l => l === clusterId).length;
-                const radius = radii[clusterId];
+            // for (let clusterId = 0; clusterId < clusters; clusterId++) {
+                // const lonLat = toLonLat(centroids[clusterId]);
+                // if (!lonLat) continue;
+                // const [lon, lat] = lonLat;
+                // const color = loggingClusterColors[clusterId % loggingClusterColors.length];
+                // const pointCount = labels.filter(l => l === clusterId).length;
+                // const radius = radii[clusterId];
                 
                 // วงกลมสีแดงล้อมรอบกลุ่ม จุดศูนย์กลาง = centroid, รัศมี = radii[clusterId]
-                if (radius && radius > 0) {
-                    const clusterCircle = L.circle([lat, lon], {
-                        radius: radius,
-                        color: "#FF0000",
-                        weight: 2,
-                        fill: false,
-                        dashArray: "6, 4"
-                    }).bindPopup(`<b>ขอบเขตกลุ่มที่ ${clusterId + 1}</b><br>รัศมี: ${radius.toFixed(1)} เมตร`);
-                    loggingCentroidLayer.addLayer(clusterCircle);
-                }
+                // if (radius && radius > 0) {
+                //     const clusterCircle = L.circle([lat, lon], {
+                //         radius: radius,
+                //         color: "#FF0000",
+                //         weight: 2,
+                //         fill: false,
+                //         dashArray: "6, 4"
+                //     }).bindPopup(`<b>ขอบเขตกลุ่มที่ ${clusterId + 1}</b><br>รัศมี: ${radius.toFixed(1)} เมตร`);
+                //     loggingCentroidLayer.addLayer(clusterCircle);
+                // }
 
-                const centroidMarker = L.circleMarker([lat, lon], {
-                    radius: 10,
-                    fillColor: color,
-                    color: "#000000",
-                    weight: 2,
-                    fillOpacity: 1
-                }).bindPopup(`<b>Centroid กลุ่มที่ ${clusterId + 1}</b><br>จำนวนจุด: ${pointCount}`);
+                // const centroidMarker = L.circleMarker([lat, lon], {
+                //     radius: 10,
+                //     fillColor: color,
+                //     color: "#000000",
+                //     weight: 2,
+                //     fillOpacity: 1
+                // }).bindPopup(`<b>Centroid กลุ่มที่ ${clusterId + 1}</b><br>จำนวนจุด: ${pointCount}`);
                 // กากบาทตรงกลาง ให้ดูออกง่ายว่าเป็น centroid ไม่ใช่จุดข้อมูลปกติ
-                centroidMarker.bindTooltip(`${clusterId + 1}`, {
-                    permanent: true,
-                    direction: "center",
-                    className: "logging-centroid-label"
-                });
-                loggingCentroidLayer.addLayer(centroidMarker);
-            }
+                // centroidMarker.bindTooltip(`${clusterId + 1}`, {
+                //     permanent: true,
+                //     direction: "center",
+                //     className: "logging-centroid-label"
+                // });
+                // loggingCentroidLayer.addLayer(centroidMarker);
+            // }
 
             // แสดงเลเยอร์จุดตัดไม้บนแผนที่ พร้อมติ๊กเช็คบ็อกซ์ให้ตรงกัน
             if (!map.hasLayer(loggingLayer)) loggingLayer.addTo(map);
@@ -418,19 +435,19 @@
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        const redIcon = L.icon({
-            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
-            shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41],
-            popupAnchor: [1, -34],
-            shadowSize: [41, 41]
-        });
+        // const redIcon = L.icon({
+        //     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png',
+        //     shadowUrl: 'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
+        //     iconSize: [25, 41],
+        //     iconAnchor: [12, 41],
+        //     popupAnchor: [1, -34],
+        //     shadowSize: [41, 41]
+        // });
 
-        L.marker([14.4875, 101.9100], { icon: redIcon })
-            .addTo(map)
-            .bindPopup("<b>เขาแผงม้า</b>")
-            .openPopup();
+        // L.marker([14.4875, 101.9100], { icon: redIcon })
+        //     .addTo(map)
+        //     .bindPopup("<b>สแกราช</b>")
+        //     .openPopup();
 
         let animalLayers = [];
 
