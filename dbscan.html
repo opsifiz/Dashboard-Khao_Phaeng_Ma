@@ -82,18 +82,17 @@
             <button id="runClustering"></button>
         </div>
 
-        
-        <div class="loggingClustering">
-            <label id="loggingClusteringLabel" for="runLoggingClustering">จัดกลุ่มจุดตัดไม้ :</label>
-            <button id="runLoggingClustering">Cluster จุดตัดไม้ (DBSCAN)</button>
-        </div>
-
         <div class="inputs">
             <label for="eps">EPS : </label>
-            <input type="number" name="" id="eps" style="width: 50px;">
+            <input type="number" name="" placeholder="100" id="eps" style="width: 50px;">
 
             <label for="minPts">Min Points : </label>
-            <input type="number" name="" id="minPts" style="width: 50px;">
+            <input type="number" name="" placeholder="3" id="minPts" style="width: 50px;">
+        </div>
+
+        <div class="loggingClusteringModalSetting">
+            <label for="loggingClusteringSettingModal"></label>
+            <button id="loggingClusteringSettingModalBtn">ตั้งค่าจัดกลุ่มจุดต้นไม้</button>
         </div>
 
         <div class="borderModal">
@@ -143,10 +142,48 @@
             <span style="color:#000000">■</span> ธันวาคม<br>
         </div>
     </div>
-    <div id="boundaryModal" class="modal">
+    <div id="loggingClusteringSettingModal" class="modal">
         <!-- Modal content -->
         <div class="modal-content">
-            <span class="close" id="close-tutorial">&times;</span>
+            <span class="close" id="loggingClusteringSettingModalCloseBtn">&times;</span>
+            <p class="modal-title">ตั้งค่าเส้นจัดกลุ่มจุดตัดไม้</p>
+            <hr>
+            <input type="checkbox" id="showLoggingLayer">
+            <span>แสดงจุดตัดไม้</span>
+            <input type="checkbox" id="showRiskLayer">
+            <span>แสดงจุดเสี่ยง</span>
+
+            <br>
+            <br>
+
+            <div class="loggingClustering">
+                <div class="inputs">
+                    <label for="eps">EPS : </label>
+                    <input type="number" placeholder="1000" name="" id="loggingClusteringEps" style="width: 50px;">
+
+                    <label for="minPts">Min Points : </label>
+                    <input type="number" placeholder="3" name="" id="loggingClusteringMinPts" style="width: 50px;">
+                </div>
+                <br>
+                <label id="loggingClusteringLabel" for="runLoggingClustering">จัดกลุ่มจุดตัดไม้ :</label>
+                <button id="runLoggingClustering">Cluster จุดตัดไม้ (DBSCAN)</button>
+                
+                <br>
+                <br>
+
+                <input type="checkbox" id="showLoggingClusteringCentroids">
+                <span>แสดงจุดเฉลี่ย (Centroid)</span>
+
+                <input type="checkbox" id="showLoggingClusteringEpsCircle">
+                <span>แสดงวง eps</span>
+            </div>
+            <!-- <br> -->
+        </div>
+    </div>
+        <div id="boundaryModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-content">
+            <span class="close" id="boundaryModalCloseBtn">&times;</span>
             <p class="modal-title">ตั้งค่าเส้นเขตแดน</p>
             <hr>
             <section class="boundary"></section>
@@ -166,6 +203,12 @@
             
             <input type="checkbox" id="showThailandBoundaryLayer">
             <span>แสดงขอบเขตประเทศไทย</span>
+
+            <input type="checkbox" id="showCentroids">
+            <span>แสดงจุดเฉลี่ย (Centroid)</span>
+
+            <input type="checkbox" id="showEpsCircle">
+            <span>แสดงวง eps</span>
             <br>
         </div>
     </div>
@@ -179,35 +222,147 @@
         };
     </script>
     <script type="module" src="scripts/boundaryController.js"></script>
+    <script>
+        const loggingClusteringSettingModal = document.getElementById("loggingClusteringSettingModal");
+        const loggingClusteringSettingModalBtn = document.getElementById("loggingClusteringSettingModalBtn");
+        const closeBtn = document.getElementById("loggingClusteringSettingModalCloseBtn");
+        loggingClusteringSettingModalBtn.onclick = function() {
+            loggingClusteringSettingModal.style.display = "block";
+        }
+        closeBtn.onclick = function() {
+            loggingClusteringSettingModal.style.display = "none";
+        }
+
+        window.addEventListener("click", (e) => {
+            if (event.target == loggingClusteringSettingModal) {
+                loggingClusteringSettingModal.style.display = "none";
+            }
+        });
+    </script>
     <script src="clustering.js"></script>
     <script src="scripts/clustering/dbscan.js"></script>
     <script>
-    function runClustering(coordinates) {
-        const eps = document.getElementById("eps").value || 100;
-        const minPts = document.getElementById("minPts").value || 3;
-        const { labels, clusters } = dbscan(coordinates, eps, minPts);
+        function runClustering(coordinates, eps, minPts) {
+            const { labels, clusters } = dbscan(coordinates, eps, minPts);
 
-        const centroids = computeCentroids(coordinates, labels, clusters);
-        const radii = computeClusterRadii(coordinates, labels, centroids);
+            const centroids = computeCentroids(coordinates, labels, clusters);
+            const radii = computeClusterRadii(coordinates, labels, centroids);
 
-        return {
-            k: clusters,
-            labels,
-            centroids,
-            radii,
-        };
-    }
+            // normalize centroids
+            normalizedCentroids = centroids.map(c => {
+                if (!c) return null;
+                if (Array.isArray(c)) {
+                    const [lon, lat] = c;
+                    return { lat, lon };
+                }
+                return c;
+            });
+
+            return {
+                k: clusters,
+                labels,
+                centroids: normalizedCentroids,
+                radii,
+            };
+        }
+
+        function renderCentroids(centroids) {
+            centroidLayer.clearLayers();
+
+            centroids.forEach((c, idx) => {
+                if (!c) return;
+
+                const marker = L.marker([c.lat, c.lon])
+                    .bindPopup(`Cluster ${idx + 1}<br>Lat: ${c.lat.toFixed(5)}<br>Lon: ${c.lon.toFixed(5)}`);
+
+                centroidLayer.addLayer(marker);
+            });
+        }
+
+        function renderEpsCircles(centroids, eps) {
+            epsCircleLayer.clearLayers();
+
+            centroids.forEach(c => {
+                if (!c) return;
+
+                let lat, lon;
+
+                if (Array.isArray(c)) {
+                    [lon, lat] = c;
+                } else {
+                    lat = c.lat;
+                    lon = c.lon;
+                }
+
+                if (lat === undefined || lon === undefined) return;
+
+                const circle = L.circle([lat, lon], {
+                    radius: eps, // meters
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.2
+                });
+
+                epsCircleLayer.addLayer(circle);
+            });
+        }
+
+        function renderLoggingCentroids(centroids) {
+            loggingCentroidLayer.clearLayers();
+
+            centroids.forEach((c, idx) => {
+                if (!c) return;
+
+                const marker = L.marker([c.lat, c.lon])
+                    .bindPopup(`Cluster ${idx + 1}<br>Lat: ${c.lat.toFixed(5)}<br>Lon: ${c.lon.toFixed(5)}`);
+
+                loggingCentroidLayer.addLayer(marker);
+            });
+        }
+
+        function renderLoggingEpsCircles(centroids, eps) {
+            loggingEpsCircleLayer.clearLayers();
+
+            centroids.forEach(c => {
+                if (!c) return;
+
+                let lat, lon;
+
+                if (Array.isArray(c)) {
+                    [lon, lat] = c;
+                } else {
+                    lat = c.lat;
+                    lon = c.lon;
+                }
+
+                if (lat === undefined || lon === undefined) return;
+
+                const circle = L.circle([lat, lon], {
+                    radius: eps, // meters
+                    color: 'red',
+                    fillColor: '#f03',
+                    fillOpacity: 0.2
+                });
+
+                loggingEpsCircleLayer.addLayer(circle);
+            });
+        }
     </script>
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.19.10/proj4.js"></script>
     <script type="module" src="scripts/selectors.js"></script>
     <script>
+        let centroidLayer = L.layerGroup();
+        let epsCircleLayer = L.layerGroup();
+
+        let loggingCentroidLayer = L.layerGroup();
+        let loggingEpsCircleLayer = L.layerGroup();
+        
         // จุดตัดไม้ (สีแดง)
         let loggingPoints = [];
         let loggingLayer = L.layerGroup();
         let loggingDisplayLayer = L.layerGroup();
-        let loggingCentroidLayer = L.layerGroup();
         fetch("./data/จุดตัดไม้.geojson")
         .then(res => res.json())
         .then(data => {
@@ -264,7 +419,6 @@
                 if(loggingDisplayLayer) loggingDisplayLayer.addTo(map);
             } else {
                 if(loggingDisplayLayer) map.removeLayer(loggingDisplayLayer);
-                if(loggingCentroidLayer) map.removeLayer(loggingCentroidLayer);
             }
         });
 
@@ -273,7 +427,6 @@
                 if(riskDisplayLayer) riskDisplayLayer.addTo(map);
             } else {
                 if(riskDisplayLayer) map.removeLayer(riskDisplayLayer);
-                if(loggingCentroidLayer) map.removeLayer(loggingCentroidLayer);
             }
         });
 
@@ -284,6 +437,40 @@
                 if(thailandBoundarylayer) map.removeLayer(thailandBoundarylayer);
             }
         });
+
+        document.getElementById("showCentroids").addEventListener("change", function () {
+            if (this.checked) {
+                centroidLayer.addTo(map);
+            } else {
+                map.removeLayer(centroidLayer);
+            }
+        });
+
+        document.getElementById("showEpsCircle").addEventListener("change", function () {
+            if (this.checked) {
+                epsCircleLayer.addTo(map);
+            } else {
+                map.removeLayer(epsCircleLayer);
+            }
+        });
+
+        
+        document.getElementById("showLoggingClusteringCentroids").addEventListener("change", function () {
+            if (this.checked) {
+                loggingCentroidLayer.addTo(map);
+            } else {
+                map.removeLayer(loggingCentroidLayer);
+            }
+        });
+
+        document.getElementById("showLoggingClusteringEpsCircle").addEventListener("change", function () {
+            if (this.checked) {
+                loggingEpsCircleLayer.addTo(map);
+            } else {
+                map.removeLayer(loggingEpsCircleLayer);
+            }
+        });
+
         
         // สีสำหรับแยกกลุ่ม (cluster) ของจุดตัดไม้ - จุดที่เป็น noise (label -1) จะเป็นสีเทา
         const loggingClusterColors = [
@@ -308,34 +495,50 @@
                 return;
             }
 
-            const eps = document.getElementById("eps").value || 1000;
-            const minPts = document.getElementById("minPts").value || 3;
             const coordinates = loggingPoints.map(p => [p.lon, p.lat]);
-            const { labels, clusters } = dbscan(coordinates, eps, minPts);
+            const eps = Number(document.getElementById("loggingClusteringEps").value || 1000);
+            const minPts = Number(document.getElementById("loggingClusteringMinPts").value || 3);
+
+            const clusteringResult = runClustering(coordinates, eps, minPts);
+            
+            renderLoggingCentroids(clusteringResult.centroids);
+            renderLoggingEpsCircles(clusteringResult.centroids, eps);
+
+            console.log(eps, minPts, clusteringResult);
+
+            const { labels, k, clusters, radii } = clusteringResult;
 
             loggingPoints.forEach((p, i) => {
                 const label = labels[i];
                 const isNoise = label === -1;
 
-                if(isNoise){
-                    // ซ่อนจุด noise ออกจากแผนที่
-                    if(loggingLayer.hasLayer(p.marker)) loggingLayer.removeLayer(p.marker);
-                    if(map.hasLayer(p.marker)) map.removeLayer(p.marker);
-                    return;
-                } else {
-                    // ถ้าเคยถูกซ่อนไว้ (จากการรันครั้งก่อน) ให้เพิ่มกลับเข้าเลเยอร์
-                    if(!loggingLayer.hasLayer(p.marker)) loggingLayer.addLayer(p.marker);
-                }
+                // if(isNoise){
+                //     // ซ่อนจุด noise ออกจากแผนที่
+                //     if(loggingLayer.hasLayer(p.marker)) loggingLayer.removeLayer(p.marker);
+                //     if(map.hasLayer(p.marker)) map.removeLayer(p.marker);
+                //     return;
+                // } else {
+                //     // ถ้าเคยถูกซ่อนไว้ (จากการรันครั้งก่อน) ให้เพิ่มกลับเข้าเลเยอร์
+                //     if(!loggingLayer.hasLayer(p.marker)) loggingLayer.addLayer(p.marker);
+                // }
 
-                const color = loggingClusterColors[label % loggingClusterColors.length];
+                // const color = loggingClusterColors[label % loggingClusterColors.length];
+                const color = isNoise ? NOISE_COLOR : loggingClusterColors[label % loggingClusterColors.length];
                 p.marker.setStyle({ fillColor: color, color: color });
-                p.marker.bindPopup(`จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
+                // p.marker.bindPopup(`จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
+                p.marker.bindPopup(isNoise ? "จุดตัดไม้ (Noise)" : `จุดตัดไม้ - กลุ่มที่ ${label + 1}`);
+
             });
-            
-            // คำนวณ centroid และรัศมีของแต่ละกลุ่ม แล้ววาด centroid + วงกลมล้อมรอบกลุ่ม (สีแดง)
-            const centroids = computeCentroids(coordinates, labels, clusters);
-            const radii = computeClusterRadii(coordinates, labels, centroids);
-            loggingCentroidLayer.clearLayers();
+
+            if (document.getElementById("showLoggingClusteringCentroids").checked) {
+                loggingCentroidLayer.addTo(map);
+            }
+
+            if (document.getElementById("showLoggingClusteringEpsCircle").checked) {
+                loggingEpsCircleLayer.addTo(map);
+            }
+
+            // loggingCentroidLayer.clearLayers();
             // for (let clusterId = 0; clusterId < clusters; clusterId++) {
                 // const lonLat = toLonLat(centroids[clusterId]);
                 // if (!lonLat) continue;
@@ -374,9 +577,10 @@
 
             // แสดงเลเยอร์จุดตัดไม้บนแผนที่ พร้อมติ๊กเช็คบ็อกซ์ให้ตรงกัน
             if (!map.hasLayer(loggingLayer)) loggingLayer.addTo(map);
-            if (!map.hasLayer(loggingCentroidLayer)) loggingCentroidLayer.addTo(map);
             const showLoggingCheckbox = document.getElementById("showLoggingLayer");
+            const showRiskCheckbox = document.getElementById("showRiskLayer");
             if (showLoggingCheckbox) showLoggingCheckbox.checked = true;
+            if (showRiskCheckbox) showRiskCheckbox.checked = true;
 
             console.log(`DBSCAN จุดตัดไม้: พบ ${clusters} กลุ่ม จากทั้งหมด ${loggingPoints.length} จุด (eps=${eps}, minPts=${minPts})`);
         });
@@ -535,10 +739,24 @@
                     }
                 });
 
-                const clusteringResult = runClustering(points);
+                const eps = Number(document.getElementById("eps").value || 100);
+                const minPts = Number(document.getElementById("minPts").value || 3);
+
+                const clusteringResult = runClustering(points, eps, minPts);
+
+                renderCentroids(clusteringResult.centroids);
+                renderEpsCircles(clusteringResult.centroids, eps);
+
+                if (document.getElementById("showCentroids").checked) {
+                    centroidLayer.addTo(map);
+                }
+
+                if (document.getElementById("showEpsCircle").checked) {
+                    epsCircleLayer.addTo(map);
+                }
                 
                 console.log(clusteringResult);
-
+                
                 animalLayers.forEach((obj, idx) => {
                     if(map.hasLayer(obj.layer)) map.removeLayer(obj.layer);
                 });
